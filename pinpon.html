@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinpon Oyunu</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        #menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button {
+            background-color: #0f0;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 20px 40px;
+            font-size: 24px;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .button:hover {
+            transform: scale(1.1);
+        }
+        canvas {
+            display: none;
+            background-color: #111;
+            border: 2px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <button class="button" id="singlePlayer">1 Oyuncu</button>
+        <button class="button" id="multiPlayer">2 Oyuncu</button>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const ballSize = 10;
+        const paddleSpeed = 8; // Hızı artırdık
+        const ballSpeedX = 7; // Hızı artırdık
+        const ballSpeedY = 5; // Hızı artırdık
+        const aiSpeed = 3; // AI hızını azalttık
+        const aiReactionTime = 15; // AI'nin tepki süresi (daha yüksek değerler daha yavaş tepki)
+        const maxScore = 10;
+
+        let leftPaddleY = (canvas.height - paddleHeight) / 2;
+        let rightPaddleY = (canvas.height - paddleHeight) / 2;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballVelocityX = ballSpeedX;
+        let ballVelocityY = ballSpeedY;
+        let leftScore = 0;
+        let rightScore = 0;
+        let gameMode = ''; // 'single' or 'multi'
+        let interval;
+        let keys = {};
+
+        function showMenu() {
+            document.getElementById('menu').style.display = 'flex';
+            canvas.style.display = 'none';
+        }
+
+        function startGame(mode) {
+            gameMode = mode;
+            document.getElementById('menu').style.display = 'none';
+            canvas.style.display = 'block';
+            leftPaddleY = (canvas.height - paddleHeight) / 2;
+            rightPaddleY = (canvas.height - paddleHeight) / 2;
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballVelocityX = ballSpeedX;
+            ballVelocityY = ballSpeedY;
+            leftScore = 0;
+            rightScore = 0;
+            clearInterval(interval);
+            interval = setInterval(draw, 1000 / 60); // 60 FPS
+        }
+
+        function drawPaddles() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(20, leftPaddleY, paddleWidth, paddleHeight); // Sol raket
+            ctx.fillRect(canvas.width - 30, rightPaddleY, paddleWidth, paddleHeight); // Sağ raket
+        }
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawScore() {
+            ctx.font = '32px Arial';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Sol: ${leftScore} - Sağ: ${rightScore}`, canvas.width / 2, 50);
+        }
+
+        function movePaddles() {
+            document.addEventListener('keydown', (e) => {
+                keys[e.code] = true;
+            });
+
+            document.addEventListener('keyup', (e) => {
+                keys[e.code] = false;
+            });
+        }
+
+        function updatePaddles() {
+            if (gameMode === 'single') {
+                if (keys['KeyW'] && leftPaddleY > 0) leftPaddleY -= paddleSpeed;
+                if (keys['KeyS'] && leftPaddleY < canvas.height - paddleHeight) leftPaddleY += paddleSpeed;
+            }
+            if (gameMode === 'multi') {
+                if (keys['KeyW'] && leftPaddleY > 0) leftPaddleY -= paddleSpeed;
+                if (keys['KeyS'] && leftPaddleY < canvas.height - paddleHeight) leftPaddleY += paddleSpeed;
+                if (keys['ArrowUp'] && rightPaddleY > 0) rightPaddleY -= paddleSpeed;
+                if (keys['ArrowDown'] && rightPaddleY < canvas.height - paddleHeight) rightPaddleY += paddleSpeed;
+            }
+        }
+
+        function moveAI() {
+            const aiTargetY = ballY - paddleHeight / 2;
+            if (rightPaddleY + paddleHeight / 2 < aiTargetY) {
+                rightPaddleY += aiSpeed;
+            } else if (rightPaddleY + paddleHeight / 2 > aiTargetY) {
+                rightPaddleY -= aiSpeed;
+            }
+
+            if (rightPaddleY < 0) rightPaddleY = 0;
+            if (rightPaddleY > canvas.height - paddleHeight) rightPaddleY = canvas.height - paddleHeight;
+        }
+
+        function updateBall() {
+            ballX += ballVelocityX;
+            ballY += ballVelocityY;
+
+            if (ballY - ballSize < 0 || ballY + ballSize > canvas.height) ballVelocityY = -ballVelocityY;
+
+            if (ballX - ballSize < 30 && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) ballVelocityX = -ballVelocityX;
+            if (ballX + ballSize > canvas.width - 30 && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight) ballVelocityX = -ballVelocityX;
+
+            if (ballX - ballSize < 0) {
+                rightScore++;
+                resetBall();
+            }
+            if (ballX + ballSize > canvas.width) {
+                leftScore++;
+                resetBall();
+            }
+
+            if (leftScore >= maxScore || rightScore >= maxScore) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    alert(`Oyun Bitti! ${leftScore >= maxScore ? 'Sol oyuncu' : 'Sağ oyuncu'} kazandı!`);
+                    showMenu();
+                }, 100);
+            }
+        }
+
+        function resetBall() {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballVelocityX = -ballVelocityX;
+            ballVelocityY = (Math.random() - 0.5) * 2 * ballSpeedY;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddles();
+            drawBall();
+            drawScore();
+            updateBall();
+            updatePaddles();
+            if (gameMode === 'single') moveAI();
+        }
+
+        document.getElementById('singlePlayer').addEventListener('click', () => startGame('single'));
+        document.getElementById('multiPlayer').addEventListener('click', () => startGame('multi'));
+
+        movePaddles();
+        showMenu(); // Menü ile başlayın
+    </script>
+</body>
+</html>
