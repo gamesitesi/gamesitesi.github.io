@@ -1,8 +1,60 @@
-<html>
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-<title>Test Deneme</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyun Sitesi Giriş Sayfası</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .menu-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu-item {
+            width: 150px;
+            height: 100px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 18px;
+            transition: transform 0.3s, background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            transform: scale(1.1);
+            background-color: #45a049;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+    </style>
 </head>
 <body>
-<h1>Merhaba</h1>
+
+    <div class="menu-container">
+        <a href="yilanoyunu.html" class="menu-item">Yılan Oyunu</a>
+        <a href="pinpon.html" class="menu-item">Pinpon</a>
+        <a href="index.html" class="menu-item">Ana Sayfa</a>
+        <a href="2048.html" class="menu-item">2048</a>
+    </div>
+
 </body>
 </html>
