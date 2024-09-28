@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butonlar</title>
+    <style>
+        body {
+            background-color: black; /* Arka plan rengi */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Tam ekran yüksekliği */
+            margin: 0; /* Varsayılan margin'i kaldır */
+        }
+        .button {
+            background-color: green; /* Buton rengi */
+            color: white; /* Buton yazı rengi */
+            font-size: 24px; /* Buton yazı boyutu */
+            padding: 20px 40px; /* Buton içi boşluk */
+            border: none; /* Kenarlık yok */
+            border-radius: 5px; /* Yuvarlatılmış köşeler */
+            cursor: pointer; /* Fare ile üzerindeyken imleci değiştir */
+            margin: 10px; /* Butonlar arası boşluk */
+            transition: transform 0.3s; /* Geçiş efekti */
+        }
+        .button:hover {
+            transform: scale(1.1); /* Üzerine gelince büyüme efekti */
+        }
+    </style>
+</head>
+<body>
+    <button class="button" onclick="window.location.href='/appel.html'">1P</button>
+    <button class="button" onclick="window.location.href='/appel1.html'">2P</button>
+</body>
+</html>
