@@ -126,7 +126,8 @@
         const branch = 'main'; // Dal adı (Varsayılan olarak 'main' kabul ediliyor)
         const githubToken = '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'; // API token'ınızı buraya koyun
 
-        const apiBase = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/`;
+        // GitHub API'sine erişim için proxy kullanma
+        const apiBase = `https://cors-anywhere.herokuapp.com/https://api.github.com/repos/${repoOwner}/${repoName}/contents/`;
 
         // Dosyaları yüklemek için fonksiyon
         async function uploadFiles() {
