@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyun Sitesi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #800000; /* Bordo arka plan */
+            color: black; /* Siyah metin rengi */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sol taraftaki butonlar için stil */
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            align-items: center;
+        }
+
+        .button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .button img {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* Oyun kutuları */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Üç sütun */
+            gap: 20px;
+            padding: 20px;
+            margin-left: 250px; /* Sol taraf için boşluk bırakıyoruz */
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .game-box {
+            width: 100%;
+            height: 400px; /* Küçültülmüş kutu boyutu */
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer; /* Tıklanabilir yapıyoruz */
+        }
+
+        .game-box:hover {
+            transform: scale(1.05);
+        }
+
+        .game-image {
+            width: 100%;
+            height: 60%; /* %60 resim alanı */
+            background-color: #ddd; /* Resim alanının arka plan rengi */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .game-content {
+            padding: 10px;
+            height: 40%; /* %40 metin alanı */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .game-description {
+            font-size: 14px;
+            color: gray;
+            font-weight: normal;
+            margin-top: 10px;
+        }
+
+        .game-footer {
+            font-size: 12px;
+            color: gray;
+            margin-top: auto;
+        }
+
+        /* Responsive tasarım */
+        @media screen and (max-width: 1200px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* 1200px'den düşük ekranlarda 2 sütun */
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr; /* 768px ve daha küçük ekranlarda 1 sütun */
+            }
+
+            .buttons {
+                display: none; /* Mobilde butonlar görünmesin */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="buttons">
+        <!-- YouTube Butonu -->
+        <div class="button" onclick="window.location.href='https://www.youtube.com'">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube">
+        </div>
+        
+        <!-- Scratch Butonu -->
+        <div class="button" onclick="window.location.href='https://scratch.mit.edu'">
+            <img src="https://scratch.mit.edu/favicon.ico" alt="Scratch">
+        </div>
+
+        <!-- GitHub Butonu -->
+        <div class="button" onclick="window.location.href='https://github.com/gamesitesi'">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub">
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Oyun Kutuları (Her biri tıklanabilir) -->
+        <div class="game-box" onclick="window.location.href='/games/uno'">
+            <div class="game-image" style="background-image: url('https://via.placeholder.com/300');"></div>
+            <div class="game-content">
+                <div class="game-title">UNO ONLINE</div>
+                <div class="game-description">Bu oyun online oynanan bir uno oyunu.</div>
+                <div class="game-footer">Oyun Türü: Aksiyon</div>
+            </div>
+        </div>
+
+        <div class="game-box" onclick="window.location.href='/'">
+            <div class="game-image" style="background-image: url('https://via.placeholder.com/300');"></div>
+            <div class="game-content">
+                <div class="game-title">Oyun Adı 2</div>
+                <div class="game-description">Bu oyun hakkında kısa bir açıklama. Eğlenceli, heyecan verici ve bağımlılık yapıcı.</div>
+                <div class="game-footer">Oyun Türü: Macera</div>
+            </div>
+        </div>
+
+        <div class="game-box" onclick="window.location.href='/'">
+            <div class="game-image" style="background-image: url('https://via.placeholder.com/300');"></div>
+            <div class="game-content">
+                <div class="game-title">Oyun Adı 3</div>
+                <div class="game-description">Bu oyun hakkında kısa bir açıklama. Eğlenceli, heyecan verici ve bağımlılık yapıcı.</div>
+                <div class="game-footer">Oyun Türü: Strateji</div>
+            </div>
+        </div>
+
+        <div class="game-box" onclick="window.location.href='/'">
+            <div class="game-image" style="background-image: url('https://via.placeholder.com/300');"></div>
+            <div class="game-content">
+                <div class="game-title">Oyun Adı 4</div>
+                <div class="game-description">Bu oyun hakkında kısa bir açıklama. Eğlenceli, heyecan verici ve bağımlılık yapıcı.</div>
+                <div class="game-footer">Oyun Türü: Bulmaca</div>
+            </div>
+        </div>
+
+        <div class="game-box" onclick="window.location.href='/'">
+            <div class="game-image" style="background-image: url('https://via.placeholder.com/300');"></div>
+            <div class="game-content">
+                <div class="game-title">Oyun Adı 5</div>
+                <div class="game-description">Bu oyun hakkında kısa bir açıklama. Eğlenceli, heyecan verici ve bağımlılık yapıcı.</div>
+                <div class="game-footer">Oyun Türü: Spor</div>
+            </div>
+        </div>
+
+        <div class="game-box" onclick="window.location.href='/'">
+            <div class="game-image" style="background-image: url('https://via.placeholder.com/300');"></div>
+            <div class="game-content">
+                <div class="game-title">Oyun Adı 6</div>
+                <div class="game-description">Bu oyun hakkında kısa bir açıklama. Eğlenceli, heyecan verici ve bağımlılık yapıcı.</div>
+                <div class="game-footer">Oyun Türü: Yarış</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
