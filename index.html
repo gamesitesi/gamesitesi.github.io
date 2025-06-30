@@ -1,126 +1,158 @@
-
 <!DOCTYPE html>
-<html lang="tr" data-theme="light">
+<html lang="tr">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026"
-     crossorigin="anonymous"></script>
-    <link rel="icon" href="ps.ico">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bedava Oyun :)</title>
-    <style>
-        :root {
-            --bg-color: #f0f0f0;
-            --text-color: #000;
-            --menu-bg: #16d7de;
-            --menu-hover: #36d646;
-            --menu-danger: #cc1d1d;
-        }
+  <link rel="icon" href="ps.ico">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bedava Oyun :)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-        [data-theme="dark"] {
-            --bg-color: #121212;
-            --text-color: #fff;
-            --menu-bg: #1e88e5;
-            --menu-hover: #43a047;
-            --menu-danger: #e53935;
-        }
+    body.dark-mode {
+      background-color: #1e1e1e;
+      color: white;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            flex-direction: column;
-        }
+    body.light-mode {
+      background-color: #f0f0f0;
+      color: black;
+    }
 
-        .menu-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
+    .menu-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 60px;
+    }
 
-        .menu-item, .menu-item1 {
-            width: 125px;
-            height: 75px;
-            background-color: var(--menu-bg);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 18px;
-            transition: transform 0.3s, background-color 0.3s;
-            text-decoration: none;
-        }
+    .menu-item,
+    .menu-item1 {
+      width: 125px;
+      height: 75px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 18px;
+      transition: transform 0.3s, background-color 0.3s;
+      text-decoration: none;
+      color: white;
+    }
 
-        .menu-item:hover {
-            transform: scale(1.1);
-            background-color: var(--menu-hover);
-        }
+    /* AÇIK tema buton renkleri */
+    body.light-mode .menu-item {
+      background-color: #16d7de;
+    }
 
-        .menu-item1 {
-            background-color: var(--menu-danger);
-        }
+    body.light-mode .menu-item1 {
+      background-color: #cc1d1d;
+    }
 
-        .menu-item1:hover {
-            transform: scale(1.1);
-            background-color: var(--menu-hover);
-        }
+    /* KOYU tema buton renkleri */
+    body.dark-mode .menu-item {
+      background-color: #0d6e73;
+    }
 
-        .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 15px;
-            border: none;
-            background-color: gray;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-    </style>
+    body.dark-mode .menu-item1 {
+      background-color: #7a1212;
+    }
+
+    .menu-item:hover,
+    .menu-item1:hover {
+      transform: scale(1.1);
+      background-color: #36d646;
+    }
+
+    .top-buttons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .top-buttons button,
+    .top-buttons a {
+      padding: 10px 15px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    body.light-mode .top-buttons button,
+    body.light-mode .top-buttons a {
+      background-color: #555;
+      color: white;
+    }
+
+    body.dark-mode .top-buttons button,
+    body.dark-mode .top-buttons a {
+      background-color: #222;
+      color: white;
+    }
+
+    .top-buttons button:hover,
+    .top-buttons a:hover {
+      background-color: #36d646;
+      color: white;
+    }
+  </style>
 </head>
 <body>
 
-    <button class="toggle-btn" onclick="toggleTheme()">🌗 Tema Değiştir</button>
+  <div class="top-buttons">
+    <button onclick="toggleTheme()">🌓Tema Değiştir</button>
+    <a href="/giris.html">Giriş / Kayıt Ol</a>
+  </div>
 
-    <div class="menu-container">
-        <a href="/jmpsak" class="menu-item">Jumping Şakir</a>
-        <a href="/pinpon" class="menu-item">Pinpon</a>
-        <a href="/2048" class="menu-item">2048</a>
-        <a href="/onlinecp" class="menu-item">Online Platformer</a>
-        <a href="/onliecp2" class="menu-item">Online Platformer 2</a>
-        <a href="/onlinecp3" class="menu-item">Online Platformer 3</a>
-        <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
-        <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
-        <a href="/games/home.html" class="menu-item1">Daha Güzel Oyunlar</a>
-    </div>
+  <h2>Bedava Oyun :)🎮</h2>
 
-    <script>
-        // Sistem temasını algıla
-        const systemPref = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const savedTheme = localStorage.getItem('theme');
+  <div class="menu-container">
+    <a href="/jmpsak" class="menu-item">Jumping Şakir</a>
+    <a href="/pinpon" class="menu-item">Pinpon</a>
+    <a href="/2048" class="menu-item">2048</a>
+    <a href="/onlinecp" class="menu-item">Platformer</a>
+    <a href="/onliecp2" class="menu-item">Platformer 2</a>
+    <a href="/onlinecp3" class="menu-item">Platformer 3</a>
+    <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
+    <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
+    <a href="/games/home.html" class="menu-item1">Diğer Oyunlar</a>
+  </div>
 
-        if (savedTheme) {
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        } else if (systemPref) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
+  <script>
+    function getCookie(name) {
+      const value = "; " + document.cookie;
+      const parts = value.split("; " + name + "=");
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    }
 
-        // Toggle butonu
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-    </script>
+    function toggleTheme() {
+      const current = document.body.classList.contains("dark-mode") ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      document.body.classList.remove(current + "-mode");
+      document.body.classList.add(next + "-mode");
+      document.cookie = "theme=" + next + "; path=/; max-age=31536000";
+    }
 
+    window.onload = function () {
+      const theme = getCookie("theme") || "dark";
+      document.body.classList.add(theme + "-mode");
+    };
+  </script>
 </body>
 </html>
