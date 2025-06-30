@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="icon" href="ps.ico" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bedava Oyun :)</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
       transition: background-color 0.3s, color 0.3s;
     }
     body.dark-mode {
@@ -24,55 +26,17 @@
       background-color: #f0f0f0;
       color: black;
     }
-    .menu-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 60px;
-    }
-    .menu-item,
-    .menu-item1 {
-      width: 125px;
-      height: 75px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 15px;
-      text-align: center;
-      font-size: 18px;
-      transition: transform 0.3s, background-color 0.3s;
-      text-decoration: none;
-      color: white;
-    }
-    /* AÇIK tema buton renkleri */
-    body.light-mode .menu-item {
-      background-color: #16d7de;
-    }
-    body.light-mode .menu-item1 {
-      background-color: #cc1d1d;
-    }
-    /* KOYU tema buton renkleri */
-    body.dark-mode .menu-item {
-      background-color: #0d6e73;
-    }
-    body.dark-mode .menu-item1 {
-      background-color: #7a1212;
-    }
-    .menu-item:hover,
-    .menu-item1:hover {
-      transform: scale(1.1);
-      background-color: #36d646;
-    }
+
     .top-buttons {
-      position: absolute;
+      position: fixed;
       top: 10px;
       right: 10px;
       display: flex;
       gap: 10px;
+      align-items: center;
     }
-    .top-buttons button,
-    .top-buttons a {
+
+    .top-buttons button, .top-buttons a {
       padding: 10px 15px;
       background-color: #444;
       color: white;
@@ -97,48 +61,74 @@
       background-color: #36d646;
       color: white;
     }
-    /* Kullanıcı adı ve çıkış butonu sol üst köşede */
-    .user-info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: white;
+
+    #user-info {
       font-weight: bold;
-      font-size: 16px;
+      margin-right: 10px;
+      display: none;
+      color: #36d646;
+    }
+
+    .menu-container {
       display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 60px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .menu-item,
+    .menu-item1 {
+      width: 125px;
+      height: 75px;
+      display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 10px;
-    }
-    .user-info button {
-      padding: 5px 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #cc1d1d;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 18px;
+      transition: transform 0.3s, background-color 0.3s;
+      text-decoration: none;
       color: white;
-      transition: background-color 0.3s;
     }
-    .user-info button:hover {
-      background-color: #a01515;
+
+    /* AÇIK tema buton renkleri */
+    body.light-mode .menu-item {
+      background-color: #16d7de;
+    }
+    body.light-mode .menu-item1 {
+      background-color: #cc1d1d;
+    }
+
+    /* KOYU tema buton renkleri */
+    body.dark-mode .menu-item {
+      background-color: #0d6e73;
+    }
+    body.dark-mode .menu-item1 {
+      background-color: #7a1212;
+    }
+
+    .menu-item:hover,
+    .menu-item1:hover {
+      transform: scale(1.1);
+      background-color: #36d646;
     }
   </style>
 
-  <!-- Firebase SDK'larını ekle -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- Firebase SDK'lar -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 </head>
 <body>
 
-  <!-- Kullanıcı adı ve çıkış butonu buraya gelecek -->
-  <div class="user-info" id="user-info" style="display:none;">
-    <span id="kullanici-adi">Hoşgeldin, Kullanıcı</span>
-    <button id="btn-cikis">Çıkış Yap</button>
-  </div>
-
   <div class="top-buttons">
-    <button onclick="toggleTheme()">🌓Tema Değiştir</button>
-    <a href="/giris.html">Giriş / Kayıt Ol</a>
+    <div id="user-info">Hoşgeldin, <span id="kullanici-adi"></span></div>
+    <button id="logoutBtn" style="display:none;">Çıkış Yap</button>
+    <button onclick="toggleTheme()">🌓 Tema Değiştir</button>
+    <a href="/giris.html" id="loginLink">Giriş / Kayıt Ol</a>
   </div>
 
   <h2>Bedava Oyun :)🎮</h2>
@@ -156,73 +146,58 @@
   </div>
 
   <script>
-    // Firebase config - kendi firebase config bilgilerini buraya ekle
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAlMVSsdR38Mgsa-J07cFSb6ulXWJ3zDxA",
+      authDomain: "gamesitesi.firebaseapp.com",
+      projectId: "gamesitesi",
+      storageBucket: "gamesitesi.appspot.com",
+      messagingSenderId: "773041885856",
+      appId: "1:773041885856:web:b262427b8f31af24bcafc5"
     };
 
-    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Tema fonksiyonları
-    function getCookie(name) {
-      const value = "; " + document.cookie;
-      const parts = value.split("; " + name + "=");
-      if (parts.length === 2) return parts.pop().split(";").shift();
-    }
+    const userInfoDiv = document.getElementById("user-info");
+    const kullaniciAdiSpan = document.getElementById("kullanici-adi");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginLink = document.getElementById("loginLink");
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const isim = user.displayName || user.email || "Kullanıcı";
+        kullaniciAdiSpan.textContent = isim;
+        userInfoDiv.style.display = "inline-block";
+        logoutBtn.style.display = "inline-block";
+        loginLink.style.display = "none";
+      } else {
+        userInfoDiv.style.display = "none";
+        logoutBtn.style.display = "none";
+        loginLink.style.display = "inline-block";
+      }
+    });
+
+    logoutBtn.onclick = () => {
+      auth.signOut().then(() => {
+        alert("Başarıyla çıkış yapıldı.");
+      });
+    };
 
     function toggleTheme() {
-      const current = document.body.classList.contains("dark-mode") ? "dark" : "light";
-      const next = current === "dark" ? "light" : "dark";
-      document.body.classList.remove(current + "-mode");
-      document.body.classList.add(next + "-mode");
-      document.cookie = "theme=" + next + "; path=/; max-age=31536000";
+      const body = document.body;
+      if (body.classList.contains("dark-mode")) {
+        body.classList.remove("dark-mode");
+        body.classList.add("light-mode");
+      } else {
+        body.classList.remove("light-mode");
+        body.classList.add("dark-mode");
+      }
     }
 
-    window.onload = function () {
-      // Tema
-      const theme = getCookie("theme") || "dark";
-      document.body.classList.add(theme + "-mode");
-
-      // Firebase kullanıcı durumu kontrolü
-      auth.onAuthStateChanged(user => {
-        const userInfoDiv = document.getElementById("user-info");
-        const kullaniciAdiSpan = document.getElementById("kullanici-adi");
-        const girisLink = document.querySelector(".top-buttons a[href='/giris.html']");
-
-        if (user) {
-          // Kullanıcı giriş yapmışsa kullanıcı adını göster ve çıkış butonunu aç
-          kullaniciAdiSpan.textContent = "Hoşgeldin, " + (user.displayName || user.email);
-          userInfoDiv.style.display = "flex";
-
-          // Giriş/Kayıt linkini gizle
-          girisLink.style.display = "none";
-        } else {
-          // Giriş yapılmamışsa kullanıcı adını gizle, çıkış butonunu kapat
-          userInfoDiv.style.display = "none";
-
-          // Giriş/Kayıt linkini göster
-          girisLink.style.display = "inline-block";
-        }
-      });
-
-      // Çıkış butonu tıklama
-      document.getElementById("btn-cikis").onclick = function () {
-        auth.signOut().then(() => {
-          alert("Çıkış yapıldı!");
-          location.reload();
-        }).catch((error) => {
-          alert("Çıkış yapılırken hata: " + error.message);
-        });
-      };
+    // Sayfa ilk yüklendiğinde tema varsayılan açık mod
+    window.onload = () => {
+      document.body.classList.add("light-mode");
     };
   </script>
-
 </body>
 </html>
