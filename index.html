@@ -6,114 +6,60 @@
   <title>Bedava Oyun :)</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      background-color: #f0f0f0;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark-mode {
-      background-color: #1e1e1e;
-      color: white;
-    }
-    body.light-mode {
-      background-color: #f0f0f0;
-      color: black;
-    }
+  body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f0f0f0;
+  transition: background-color 0.3s, color 0.3s;
+  padding-top: 60px; /* Üstteki butonlar için boşluk */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    .top-buttons {
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+.top-buttons {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
 
-    .top-buttons button, .top-buttons a {
-      padding: 10px 15px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    body.light-mode .top-buttons button,
-    body.light-mode .top-buttons a {
-      background-color: #555;
-      color: white;
-    }
-    body.dark-mode .top-buttons button,
-    body.dark-mode .top-buttons a {
-      background-color: #222;
-      color: white;
-    }
-    .top-buttons button:hover,
-    .top-buttons a:hover {
-      background-color: #36d646;
-      color: white;
-    }
+.top-buttons button,
+.top-buttons a {
+  background-color: #444;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  box-sizing: border-box;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
 
-    #user-info {
-      font-weight: bold;
-      margin-right: 10px;
-      display: none;
-      color: #36d646;
-    }
+.top-buttons button:hover,
+.top-buttons a:hover {
+  background-color: #36d646;
+  color: white;
+}
 
-    .menu-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 60px;
-      width: 100%;
-      max-width: 900px;
-    }
+.menu-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+  max-width: 1000px;
+}
 
-    .menu-item,
-    .menu-item1 {
-      width: 125px;
-      height: 75px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 15px;
-      text-align: center;
-      font-size: 18px;
-      transition: transform 0.3s, background-color 0.3s;
-      text-decoration: none;
-      color: white;
-    }
-
-    /* AÇIK tema buton renkleri */
-    body.light-mode .menu-item {
-      background-color: #16d7de;
-    }
-    body.light-mode .menu-item1 {
-      background-color: #cc1d1d;
-    }
-
-    /* KOYU tema buton renkleri */
-    body.dark-mode .menu-item {
-      background-color: #0d6e73;
-    }
-    body.dark-mode .menu-item1 {
-      background-color: #7a1212;
-    }
-
-    .menu-item:hover,
-    .menu-item1:hover {
-      transform: scale(1.1);
-      background-color: #36d646;
-    }
   </style>
 
   <!-- Firebase SDK'lar -->
