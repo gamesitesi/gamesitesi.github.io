@@ -1,32 +1,53 @@
+
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026"
      crossorigin="anonymous"></script>
-     <link rel="icon" href="ps.ico">
+    <link rel="icon" href="ps.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bedava Oyun:)</title>
+    <title>Bedava Oyun :)</title>
     <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --text-color: #000;
+            --menu-bg: #16d7de;
+            --menu-hover: #36d646;
+            --menu-danger: #cc1d1d;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #fff;
+            --menu-bg: #1e88e5;
+            --menu-hover: #43a047;
+            --menu-danger: #e53935;
+        }
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
+            flex-direction: column;
         }
 
         .menu-container {
             display: flex;
+            flex-wrap: wrap;
             gap: 20px;
+            justify-content: center;
         }
 
-        .menu-item {
+        .menu-item, .menu-item1 {
             width: 125px;
             height: 75px;
-            background-color: #16d7de;
+            background-color: var(--menu-bg);
             color: white;
             display: flex;
             justify-content: center;
@@ -40,48 +61,66 @@
 
         .menu-item:hover {
             transform: scale(1.1);
-            background-color: #36d646;
-        }
-		.menu-item1:hover {
-            transform: scale(1.1);
-            background-color: #36d646;
+            background-color: var(--menu-hover);
         }
 
-        a {
-            color: white;
-            text-decoration: none;
+        .menu-item1 {
+            background-color: var(--menu-danger);
         }
-.menu-item1 {
-            width: 125px;
-            height: 75px;
-            background-color: #cc1d1d;
+
+        .menu-item1:hover {
+            transform: scale(1.1);
+            background-color: var(--menu-hover);
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border: none;
+            background-color: gray;
             color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 18px;
-            transition: transform 0.3s, background-color 0.3s;
-            text-decoration: none;
+            border-radius: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
+    <button class="toggle-btn" onclick="toggleTheme()">🌗 Tema Değiştir</button>
+
     <div class="menu-container">
         <a href="/jmpsak" class="menu-item">Jumping Şakir</a>
         <a href="/pinpon" class="menu-item">Pinpon</a>
-        
         <a href="/2048" class="menu-item">2048</a>
-        
         <a href="/onlinecp" class="menu-item">Online Platformer</a>
         <a href="/onliecp2" class="menu-item">Online Platformer 2</a>
         <a href="/onlinecp3" class="menu-item">Online Platformer 3</a>
-	   <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
-	   <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
-	   <a href="/games/home.html" class="menu-item1">Diğer Oyunlar (bunlar daha güzel)</a>
+        <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
+        <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
+        <a href="/games/home.html" class="menu-item1">Daha Güzel Oyunlar</a>
     </div>
+
+    <script>
+        // Sistem temasını algıla
+        const systemPref = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const savedTheme = localStorage.getItem('theme');
+
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (systemPref) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Toggle butonu
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+    </script>
 
 </body>
 </html>
