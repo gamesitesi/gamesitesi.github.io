@@ -65,18 +65,15 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
   <script>
-    // Firebase konfigürasyonunu kendi projenle değiştir
     const firebaseConfig = {
       apiKey: "AIzaSyAlMVSsdR38Mgsa-J07cFSb6ulXWJ3zDxA",
       authDomain: "gamesitesi.firebaseapp.com",
       projectId: "gamesitesi",
       storageBucket: "gamesitesi.appspot.com",
-      messagingSenderId: "1:773041885856:web:b262427b8f31af24bcafc5",
-      appId: "APP_ID"
-
+      messagingSenderId: "773041885856",
+      appId: "1:773041885856:web:b262427b8f31af24bcafc5"
     };
 
-    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -85,7 +82,6 @@
       const loginBtn = document.getElementById('loginBtn');
       const messageDiv = document.getElementById('message');
 
-      // Kayıt olma fonksiyonu
       registerBtn.onclick = () => {
         const displayName = document.getElementById('displayName').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -106,14 +102,13 @@
 
         auth.createUserWithEmailAndPassword(email, password)
           .then(userCredential => {
-            // displayName güncelle
             return userCredential.user.updateProfile({ displayName: displayName });
           })
           .then(() => {
             messageDiv.style.color = "green";
             messageDiv.textContent = "Kayıt başarılı! Yönlendiriliyorsunuz...";
             setTimeout(() => {
-              window.location.href = "/index.html"; // Ana sayfa yolu
+              window.location.href = "/index.html";
             }, 1500);
           })
           .catch(error => {
@@ -122,7 +117,6 @@
           });
       };
 
-      // Giriş yapma fonksiyonu
       loginBtn.onclick = () => {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
@@ -137,7 +131,7 @@
             messageDiv.style.color = "green";
             messageDiv.textContent = "Giriş başarılı! Yönlendiriliyorsunuz...";
             setTimeout(() => {
-              window.location.href = "/index.html"; // Ana sayfa yolu
+              window.location.href = "/index.html";
             }, 1500);
           })
           .catch(error => {
