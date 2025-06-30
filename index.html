@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="icon" href="ps.ico">
+  <link rel="icon" href="ps.ico" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bedava Oyun :)</title>
   <style>
     body {
@@ -50,7 +50,7 @@
       color: white;
     }
 
-    /* AÇIK tema buton renkleri */
+    /* Açık tema buton renkleri */
     body.light-mode .menu-item {
       background-color: #16d7de;
     }
@@ -59,7 +59,7 @@
       background-color: #cc1d1d;
     }
 
-    /* KOYU tema buton renkleri */
+    /* Koyu tema buton renkleri */
     body.dark-mode .menu-item {
       background-color: #0d6e73;
     }
@@ -111,9 +111,77 @@
       background-color: #36d646;
       color: white;
     }
+
+    /* Kullanıcı adı alanı sol üstte */
+    #user-info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      color: white;
+      display: none;
+      user-select: none;
+      background-color: rgba(0,0,0,0.3);
+      padding: 5px 10px;
+      border-radius: 8px;
+      z-index: 9999;
+    }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "API_KEY_HERE",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function getCookie(name) {
+      const value = "; " + document.cookie;
+      const parts = value.split("; " + name + "=");
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    }
+
+    function toggleTheme() {
+      const current = document.body.classList.contains("dark-mode") ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      document.body.classList.remove(current + "-mode");
+      document.body.classList.add(next + "-mode");
+      document.cookie = "theme=" + next + "; path=/; max-age=31536000";
+    }
+
+    window.onload = () => {
+      // Tema ayarı
+      const theme = getCookie("theme") || "dark";
+      document.body.classList.add(theme + "-mode");
+
+      // Kullanıcı durumu kontrolü
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          const username = user.displayName || user.email.split('@')[0];
+          const userInfoDiv = document.getElementById('user-info');
+          const usernameSpan = document.getElementById('username');
+          usernameSpan.textContent = username;
+          userInfoDiv.style.display = 'block';
+        } else {
+          document.getElementById('user-info').style.display = 'none';
+        }
+      });
+    };
+  </script>
 </head>
 <body>
+  <div id="user-info">Kullanıcı: <span id="username"></span></div>
 
   <div class="top-buttons">
     <button onclick="toggleTheme()">🌓Tema Değiştir</button>
@@ -133,26 +201,5 @@
     <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
     <a href="/games/home.html" class="menu-item1">Diğer Oyunlar</a>
   </div>
-
-  <script>
-    function getCookie(name) {
-      const value = "; " + document.cookie;
-      const parts = value.split("; " + name + "=");
-      if (parts.length === 2) return parts.pop().split(";").shift();
-    }
-
-    function toggleTheme() {
-      const current = document.body.classList.contains("dark-mode") ? "dark" : "light";
-      const next = current === "dark" ? "light" : "dark";
-      document.body.classList.remove(current + "-mode");
-      document.body.classList.add(next + "-mode");
-      document.cookie = "theme=" + next + "; path=/; max-age=31536000";
-    }
-
-    window.onload = function () {
-      const theme = getCookie("theme") || "dark";
-      document.body.classList.add(theme + "-mode");
-    };
-  </script>
 </body>
 </html>
