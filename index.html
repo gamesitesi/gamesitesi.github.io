@@ -50,7 +50,7 @@
       color: white;
     }
 
-    /* Açık tema buton renkleri */
+    /* AÇIK tema buton renkleri */
     body.light-mode .menu-item {
       background-color: #16d7de;
     }
@@ -59,7 +59,7 @@
       background-color: #cc1d1d;
     }
 
-    /* Koyu tema buton renkleri */
+    /* KOYU tema buton renkleri */
     body.dark-mode .menu-item {
       background-color: #0d6e73;
     }
@@ -80,6 +80,7 @@
       right: 10px;
       display: flex;
       gap: 10px;
+      align-items: center;
     }
 
     .top-buttons button,
@@ -92,6 +93,7 @@
       text-decoration: none;
       cursor: pointer;
       transition: background-color 0.3s;
+      font-size: 14px;
     }
 
     body.light-mode .top-buttons button,
@@ -112,40 +114,53 @@
       color: white;
     }
 
-    /* Kullanıcı adı alanı sol üstte */
-    #user-info {
-      position: fixed;
-      top: 10px;
-      left: 10px;
+    #kullaniciAdi {
       font-weight: bold;
-      font-size: 16px;
-      color: white;
-      display: none;
+      color: #36d646;
       user-select: none;
-      background-color: rgba(0,0,0,0.3);
-      padding: 5px 10px;
-      border-radius: 8px;
-      z-index: 9999;
     }
   </style>
+</head>
+<body>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <div class="top-buttons">
+    <button onclick="toggleTheme()">🌓 Tema Değiştir</button>
+    <a href="/giris.html" id="girisLink">Giriş / Kayıt Ol</a>
+    <button id="logoutBtn" onclick="cikisYap()" style="display:none;">Çıkış Yap</button>
+    <span id="kullaniciAdi"></span>
+  </div>
+
+  <h2>Bedava Oyun :) 🎮</h2>
+
+  <div class="menu-container">
+    <a href="/jmpsak" class="menu-item">Jumping Şakir</a>
+    <a href="/pinpon" class="menu-item">Pinpon</a>
+    <a href="/2048" class="menu-item">2048</a>
+    <a href="/onlinecp" class="menu-item">Platformer</a>
+    <a href="/onliecp2" class="menu-item">Platformer 2</a>
+    <a href="/onlinecp3" class="menu-item">Platformer 3</a>
+    <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
+    <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
+    <a href="/games/home.html" class="menu-item1">Diğer Oyunlar</a>
+  </div>
+
+  <!-- Firebase SDK'ları -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
   <script>
+    // Firebase config (kendi bilgilerinle değiştir!)
     const firebaseConfig = {
-      apiKey: "AIzaSyAlMVSsdR38Mgsa-J07cFSb6ulXWJ3zDxA",
-      authDomain: "gamesitesi.firebaseapp.com",
-      projectId: "gamesitesi",
-      storageBucket: "gamesitesi.firebasestorage.app",
-      messagingSenderId: "773041885856",
-      appId: "1:773041885856:web:b262427b8f31af24bcafc5"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      // ... diğer config değerleri
     };
 
+    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
 
+    // Tema için çerez fonksiyonları
     function getCookie(name) {
       const value = "; " + document.cookie;
       const parts = value.split("; " + name + "=");
@@ -160,46 +175,41 @@
       document.cookie = "theme=" + next + "; path=/; max-age=31536000";
     }
 
-    window.onload = () => {
-      // Tema ayarı
+    // Sayfa yüklenince tema ve kullanıcı durumu kontrolü
+    window.onload = function () {
       const theme = getCookie("theme") || "dark";
       document.body.classList.add(theme + "-mode");
 
-      // Kullanıcı durumu kontrolü
-      auth.onAuthStateChanged(user => {
+      // Firebase Auth dinleyici
+      firebase.auth().onAuthStateChanged(user => {
+        const logoutBtn = document.getElementById("logoutBtn");
+        const kullaniciAdiSpan = document.getElementById("kullaniciAdi");
+        const girisLink = document.getElementById("girisLink");
+
         if (user) {
-          const username = user.displayName || user.email.split('@')[0];
-          const userInfoDiv = document.getElementById('user-info');
-          const usernameSpan = document.getElementById('username');
-          usernameSpan.textContent = username;
-          userInfoDiv.style.display = 'block';
+          kullaniciAdiSpan.textContent = "Hoşgeldin, " + (user.displayName || user.email);
+          logoutBtn.style.display = "inline-block";
+          girisLink.style.display = "none";
         } else {
-          document.getElementById('user-info').style.display = 'none';
+          kullaniciAdiSpan.textContent = "";
+          logoutBtn.style.display = "none";
+          girisLink.style.display = "inline-block";
         }
       });
     };
+
+    // Çıkış yap fonksiyonu
+    function cikisYap() {
+      firebase.auth().signOut()
+        .then(() => {
+          alert("Başarıyla çıkış yapıldı.");
+          window.location.href = "/index.html";  // Ana sayfaya yönlendir
+        })
+        .catch(error => {
+          alert("Çıkış yapılamadı: " + error.message);
+        });
+    }
   </script>
-</head>
-<body>
-  <div id="user-info">Kullanıcı: <span id="username"></span></div>
 
-  <div class="top-buttons">
-    <button onclick="toggleTheme()">🌓Tema Değiştir</button>
-    <a href="/giris.html">Giriş / Kayıt Ol</a>
-  </div>
-
-  <h2>Bedava Oyun :)🎮</h2>
-
-  <div class="menu-container">
-    <a href="/jmpsak" class="menu-item">Jumping Şakir</a>
-    <a href="/pinpon" class="menu-item">Pinpon</a>
-    <a href="/2048" class="menu-item">2048</a>
-    <a href="/onlinecp" class="menu-item">Platformer</a>
-    <a href="/onliecp2" class="menu-item">Platformer 2</a>
-    <a href="/onlinecp3" class="menu-item">Platformer 3</a>
-    <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
-    <a href="/sayfa2/anasayfa" class="menu-item">Sayfa 2</a>
-    <a href="/games/home.html" class="menu-item1">Diğer Oyunlar</a>
-  </div>
 </body>
 </html>
