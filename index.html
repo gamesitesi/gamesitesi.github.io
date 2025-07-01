@@ -13,7 +13,7 @@
       min-height: 100vh;
       background-color: #f0f0f0;
       transition: background-color 0.3s, color 0.3s;
-      padding-top: 60px; /* Üstteki butonlar için boşluk */
+      padding-top: 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -103,7 +103,6 @@
       user-select: none;
     }
 
-    /* Açık tema buton renkleri */
     body.light-mode .menu-item {
       background-color: #16d7de;
     }
@@ -112,7 +111,6 @@
       background-color: #cc1d1d;
     }
 
-    /* Koyu tema buton renkleri */
     body.dark-mode .menu-item {
       background-color: #0d6e73;
     }
@@ -127,7 +125,7 @@
       background-color: #36d646;
     }
 
-    /* Kullanıcı adı, coin ve çıkış butonu alanı */
+    /* Kullanıcı adı, coin ve çıkış butonu alanı yan yana */
     #user-info {
       position: fixed;
       top: 10px;
@@ -174,7 +172,7 @@
 
   <div id="user-info" style="display:none;">
     <span id="displayName"></span>
-    <span id="coinCount">0 Coin</span>
+    <span>Coins: <span id="coinCount">0</span></span>
     <button onclick="signOut()">Çıkış Yap</button>
   </div>
 
@@ -202,7 +200,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase konfigürasyonunu kendi projenle değiştir
     const firebaseConfig = {
       apiKey: "AIzaSyAlMVSsdR38Mgsa-J07cFSb6ulXWJ3zDxA",
       authDomain: "gamesitesi.firebaseapp.com",
@@ -212,7 +209,6 @@
       appId: "1:773041885856:web:b262427b8f31af24bcafc5"
     };
 
-    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -232,70 +228,185 @@
       document.cookie = "theme=" + next + "; path=/; max-age=31536000";
     }
 
-    let userDocRef;
-    let coins = 0;
-    let user;
+    let currentUser = null;
+    let currentUserData = null;
 
-    function updateCoinsDisplay() {
-      document.getElementById('coinCount').textContent = coins + ' Coin';
+    // Coin sayaç güncelleme fonksiyonu
+    function updateCoinUI(coins) {
+      const coinSpan = document.getElementById('coinCount');
+      coinSpan.textContent = coins;
     }
 
-    window.onload = function () {
-      const theme = getCookie("theme") || "dark";
-      document.body.classList.add(theme + "-mode");
+    // Kullanıcı verisini Firestore'dan al
+    async function loadUserData(uid) {
+      const docRef = db.collection('users').doc(uid);
+      const doc = await docRef.get();
+      if (doc.exists) {
+        return doc.data();
+      } else {
+        // Yeni kullanıcı için doc oluştur
+        await docRef.set({ coins: 0, premiumUntil: null });
+        return { coins: 0, premiumUntil: null };
+      }
+    }
 
-      auth.onAuthStateChanged(async (u) => {
-        user = u;
-        const userInfoDiv = document.getElementById('user-info');
-        const displayNameSpan = document.getElementById('displayName');
+    // Kullanıcı verisini Firestore'a kaydet
+    async function saveUserData(uid, data) {
+      const docRef = db.collection('users').doc(uid);
+      await docRef.set(data, { merge: true });
+    }
 
-        if (user) {
-          displayNameSpan.textContent = user.displayName || user.email;
-          userInfoDiv.style.display = 'flex';
+    // Premium kontrol fonksiyonu (admin sonsuz premium)
+    function checkPremium(userData, username) {
+      if (username.toLowerCase() === 'admin') return true;
 
-          userDocRef = db.collection('users').doc(user.uid);
-          const userDoc = await userDocRef.get();
+      const now = new Date();
+      if (!userData.premiumUntil) return false;
 
-          if (!userDoc.exists) {
-            // Kullanıcı dokümanı yoksa oluştur
-            await userDocRef.set({
-              coins: 0,
-              premiumUntil: null
-            });
-            coins = 0;
-          } else {
-            coins = userDoc.data().coins || 0;
+      const premiumDate = new Date(userData.premiumUntil);
+      return premiumDate > now;
+    }
+
+    // 1 dakikada 1 coin ver (premium fark etmeksizin)
+    function startCoinInterval() {
+      setInterval(async () => {
+        if (!currentUser || !currentUserData) return;
+
+        currentUserData.coins = currentUserData.coins || 0;
+
+        // Admine coin ver (1 coin)
+        // Premium kullanıcılara da 1 coin veriliyor (senin istediğin gibi)
+        currentUserData.coins += 1;
+
+        await saveUserData(currentUser.uid, currentUserData);
+        updateCoinUI(currentUserData.coins);
+      }, 60000); // 60000ms = 1 dakika
+    }
+
+    // Premium satın alma butonu ekle
+    function createPremiumButton() {
+      const container = document.createElement('div');
+      container.style.margin = '20px';
+      container.style.textAlign = 'center';
+
+      const btn = document.createElement('button');
+      btn.textContent = 'Premium Satın Al (200 Coin)';
+      btn.style.padding = '12px 20px';
+      btn.style.fontSize = '18px';
+      btn.style.cursor = 'pointer';
+      btn.style.borderRadius = '10px';
+      btn.style.border = 'none';
+      btn.style.backgroundColor = '#36d646';
+      btn.style.color = 'white';
+      btn.style.userSelect = 'none';
+
+      btn.onclick = async () => {
+        if (!currentUserData) return alert('Kullanıcı verisi yüklenemedi.');
+
+        if (currentUserData.coins >= 200) {
+          const now = new Date();
+          const twoWeeksLater = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+          // Admin sonsuz premium, satın almasını engelle (isteğe bağlı)
+          if ((currentUser.displayName || '').toLowerCase() === 'admin') {
+            alert('Admin zaten sonsuz premium sahibi.');
+            return;
           }
 
-          updateCoinsDisplay();
+          currentUserData.coins -= 200;
 
-          // Her dakika 1 coin artır (admin hariç)
-          setInterval(async () => {
-            if ((user.displayName || user.email) === 'admin') {
-              // Admin kullanıcısına coin verme
-              coins = 0;
-              updateCoinsDisplay();
-              return;
+          // Eğer premium zaten varsa, süresine 2 hafta ekle
+          if (currentUserData.premiumUntil) {
+            const currentPremiumDate = new Date(currentUserData.premiumUntil);
+            if (currentPremiumDate > now) {
+              currentUserData.premiumUntil = new Date(currentPremiumDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+            } else {
+              currentUserData.premiumUntil = twoWeeksLater;
             }
+          } else {
+            currentUserData.premiumUntil = twoWeeksLater;
+          }
 
-            coins += 1; // Premium veya değil herkes 1 coin alıyor
-            await userDocRef.update({ coins: coins });
-            updateCoinsDisplay();
-          }, 60000); // 60000ms = 1 dakika
+          await saveUserData(currentUser.uid, currentUserData);
+          alert('Premium başarıyla satın alındı!');
 
+          updateCoinUI(currentUserData.coins);
+          showPremiumStatus();
         } else {
-          userInfoDiv.style.display = 'none';
+          alert('Yeterli coin yok!');
         }
-      });
-    };
+      };
 
-    // Çıkış yapma fonksiyonu
-    function signOut() {
-      auth.signOut().then(() => {
-        window.location.href = "/index.html"; // Çıkış sonrası ana sayfa yenile
-      });
+      container.appendChild(btn);
+      document.body.insertBefore(container, document.querySelector('.menu-container'));
     }
-  </script>
 
+    // Premium durumu göster (isteğe bağlı)
+    function showPremiumStatus() {
+      const premiumStatus = document.getElementById('premiumStatus');
+      if (!premiumStatus) {
+        const p = document.createElement('p');
+        p.id = 'premiumStatus';
+        p.style.textAlign = 'center';
+        p.style.fontWeight = 'bold';
+        p.style.marginTop = '15px';
+        document.querySelector('.menu-container').parentNode.insertBefore(p, document.querySelector('.menu-container'));
+      }
+
+      const isPremium = checkPremium(currentUserData, (currentUser.displayName || '').toLowerCase());
+      const p = document.getElementById('premiumStatus');
+      if (isPremium) {
+        p.textContent = 'Premium Üye - Reklamsız ve ekstra özellikler!';
+        p.style.color = '#36d646';
+      } else {
+        p.textContent = 'Premium Üye Değilsiniz.';
+        p.style.color = 'red';
+      }
+    }
+
+    // Çıkış yap
+    function signOut() {
+      auth.signOut();
+    }
+
+    // Kullanıcı değişimi dinle
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user;
+      if (user) {
+        const username = (user.displayName || user.email || '').toLowerCase();
+        currentUserData = await loadUserData(user.uid);
+
+        // Admin kullanıcı için premiumUntil'ı sonsuz gibi göster (opsiyonel)
+        if (username === 'admin') {
+          currentUserData.premiumUntil = '9999-12-31T23:59:59Z';
+        }
+
+        updateCoinUI(currentUserData.coins || 0);
+
+        // Kullanıcı adı, coin ve çıkış butonu göster
+        document.getElementById('displayName').textContent = user.displayName || user.email || 'Kullanıcı';
+        document.getElementById('coinCount').textContent = currentUserData.coins || 0;
+        document.getElementById('user-info').style.display = 'flex';
+
+        showPremiumStatus();
+
+        startCoinInterval();
+      } else {
+        // Oturum yoksa
+        currentUserData = null;
+        document.getElementById('user-info').style.display = 'none';
+        updateCoinUI(0);
+        document.getElementById('displayName').textContent = '';
+      }
+    });
+
+    // Sayfa yüklendiğinde tema ayarını uygula
+    window.onload = () => {
+      const theme = getCookie('theme') || 'light';
+      document.body.classList.add(theme + '-mode');
+
+      createPremiumButton();
+    };
+  </script>
 </body>
 </html>
