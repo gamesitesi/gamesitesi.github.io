@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bedava Oyun :)</title>
-
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026"
+     crossorigin="anonymous"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,19 +13,22 @@
       min-height: 100vh;
       background-color: #f0f0f0;
       transition: background-color 0.3s, color 0.3s;
-      padding-top: 60px;
+      padding-top: 60px; /* Üstteki butonlar için boşluk */
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     body.dark-mode {
       background-color: #1e1e1e;
       color: white;
     }
+
     body.light-mode {
       background-color: #f0f0f0;
       color: black;
     }
+
     .top-buttons {
       position: fixed;
       top: 10px;
@@ -33,6 +37,7 @@
       gap: 10px;
       z-index: 1000;
     }
+
     .top-buttons button,
     .top-buttons a {
       background-color: #444;
@@ -50,21 +55,25 @@
       text-decoration: none;
       transition: background-color 0.3s;
     }
+
     body.light-mode .top-buttons button,
     body.light-mode .top-buttons a {
       background-color: #555;
       color: white;
     }
+
     body.dark-mode .top-buttons button,
     body.dark-mode .top-buttons a {
       background-color: #222;
       color: white;
     }
+
     .top-buttons button:hover,
     .top-buttons a:hover {
       background-color: #36d646;
       color: white;
     }
+
     .menu-container {
       display: flex;
       flex-wrap: wrap;
@@ -76,6 +85,7 @@
       padding: 0 10px;
       box-sizing: border-box;
     }
+
     .menu-item,
     .menu-item1 {
       width: 125px;
@@ -92,24 +102,32 @@
       cursor: pointer;
       user-select: none;
     }
+
+    /* Açık tema buton renkleri */
     body.light-mode .menu-item {
       background-color: #16d7de;
     }
+
     body.light-mode .menu-item1 {
       background-color: #cc1d1d;
     }
+
+    /* Koyu tema buton renkleri */
     body.dark-mode .menu-item {
       background-color: #0d6e73;
     }
+
     body.dark-mode .menu-item1 {
       background-color: #7a1212;
     }
+
     .menu-item:hover,
     .menu-item1:hover {
       transform: scale(1.1);
       background-color: #36d646;
     }
-    /* Kullanıcı adı, coin ve çıkış butonu */
+
+    /* Kullanıcı adı ve çıkış butonu alanı */
     #user-info {
       position: fixed;
       top: 10px;
@@ -121,11 +139,12 @@
       border-radius: 8px;
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
       z-index: 1000;
       font-size: 16px;
       user-select: none;
     }
+
     #user-info button {
       background-color: #cc1d1d;
       border: none;
@@ -136,24 +155,55 @@
       font-size: 14px;
       transition: background-color 0.3s;
     }
+
     #user-info button:hover {
       background-color: #e04b4b;
     }
-    #premium-label {
-      background-color: gold;
-      color: black;
-      padding: 3px 7px;
-      border-radius: 6px;
+
+    /* Coin ve premium alanı */
+    #coins-display {
+      position: fixed;
+      top: 10px;
+      left: 200px;
+      color: gold;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 18px;
+      background-color: rgba(0,0,0,0.4);
+      padding: 8px 12px;
+      border-radius: 8px;
+      z-index: 1000;
       user-select: none;
     }
-    #coins {
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 3px 7px;
-      border-radius: 6px;
-      font-size: 14px;
+
+    #buyPremiumBtn {
+      position: fixed;
+      top: 10px;
+      left: 350px;
+      padding: 8px 15px;
+      font-size: 16px;
+      border-radius: 8px;
+      background-color: #cc1d1d;
+      color: white;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
       user-select: none;
+      transition: background-color 0.3s;
+    }
+
+    #buyPremiumBtn:hover {
+      background-color: #e04b4b;
+    }
+
+    /* Reklam alanı */
+    #ad-container {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 728px;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   </style>
 </head>
@@ -165,11 +215,12 @@
   </div>
 
   <div id="user-info" style="display:none;">
-    <span id="displayName">Kullanıcı</span>
-    <span id="coins">0 Coin</span>
-    <span id="premium-label" style="display:none;">Premium</span>
+    <span id="displayName"></span>
     <button onclick="signOut()">Çıkış Yap</button>
   </div>
+
+  <div id="coins-display" style="display:none;">0 Coin</div>
+  <button id="buyPremiumBtn">Premium Satın Al (500 Coin)</button>
 
   <h2>Bedava Oyun :)🎮</h2>
 
@@ -189,15 +240,15 @@
     <a href="/games/home.html" class="menu-item1">Diğer Oyunlar (minecraft var)</a>
   </div>
 
-  <!-- Reklamlar için konteyner (isteğe bağlı) -->
-  <div id="ads-container" style="width: 320px; margin: 20px auto; text-align:center;">
-    <!-- Adsense reklamlar buraya dinamik yüklenecek -->
+  <div id="ad-container">
+    <!-- Google Adsense reklam alanı -->
     <ins class="adsbygoogle"
-         style="display:block"
+         style="display:inline-block;width:728px;height:90px"
          data-ad-client="ca-pub-8243937357954026"
-         data-ad-slot="1234567890"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+         data-ad-slot="1234567890"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
   </div>
 
   <!-- Firebase SDK'lar -->
@@ -216,6 +267,7 @@
       appId: "1:773041885856:web:b262427b8f31af24bcafc5"
     };
 
+    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -226,6 +278,7 @@
       const parts = value.split("; " + name + "=");
       if (parts.length === 2) return parts.pop().split(";").shift();
     }
+
     function toggleTheme() {
       const current = document.body.classList.contains("dark-mode") ? "dark" : "light";
       const next = current === "dark" ? "light" : "dark";
@@ -234,101 +287,108 @@
       document.cookie = "theme=" + next + "; path=/; max-age=31536000";
     }
 
-    // Reklam scriptini dinamik ekleme fonksiyonu
-    function loadAdsenseScript() {
-      if (window.adsbygoogleLoaded) return; // birden fazla eklenmesin
-      const script = document.createElement('script');
-      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026";
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      document.head.appendChild(script);
-      window.adsbygoogleLoaded = true;
-      // Reklamları başlat
-      script.onload = () => {
-        (adsbygoogle = window.adsbygoogle || []).push({});
+    let userDocRef = null;
+    let coins = 0;
+    let premiumUntil = 0;
+    const coinsSpan = document.getElementById('coins-display');
+    const buyPremiumBtn = document.getElementById('buyPremiumBtn');
+
+    function updateCoinsDisplay() {
+      coinsSpan.textContent = coins + " Coin";
+    }
+
+    function checkPremium() {
+      const now = Date.now();
+      if (premiumUntil > now) {
+        // Premium aktif: Reklamları gizle
+        document.getElementById('ad-container').style.display = "none";
+        buyPremiumBtn.textContent = "Premium Aktif 🎉";
+        buyPremiumBtn.disabled = true;
+        buyPremiumBtn.style.backgroundColor = "#4CAF50"; // yeşil
+      } else {
+        // Premium yoksa reklam göster
+        document.getElementById('ad-container').style.display = "flex";
+        buyPremiumBtn.textContent = "Premium Satın Al (500 Coin)";
+        buyPremiumBtn.disabled = false;
+        buyPremiumBtn.style.backgroundColor = "#cc1d1d";
       }
     }
 
-    // Kullanıcı bilgilerini ve coinleri yönet
-    let coinInterval;
-
-    auth.onAuthStateChanged(async user => {
+    auth.onAuthStateChanged(async (user) => {
       const userInfoDiv = document.getElementById('user-info');
       const displayNameSpan = document.getElementById('displayName');
-      const coinsSpan = document.getElementById('coins');
-      const premiumLabel = document.getElementById('premium-label');
-      const adsContainer = document.getElementById('ads-container');
 
       if (user) {
-        const userDocRef = db.collection('users').doc(user.uid);
+        displayNameSpan.textContent = user.displayName || user.email;
+        userInfoDiv.style.display = 'flex';
+        coinsSpan.style.display = 'inline-block';
+
+        userDocRef = db.collection('users').doc(user.uid);
+
         const doc = await userDocRef.get();
-        let userData = doc.exists ? doc.data() : {};
-
-        displayNameSpan.textContent = user.displayName || user.email || "Kullanıcı";
-
-        // Coin ve premium süresi
-        let coins = userData.coins || 0;
-        let premiumUntil = userData.premiumUntil || 0;
-        const now = Date.now();
-
-        // Premium aktif mi?
-        if (premiumUntil > now) {
-          premiumLabel.style.display = "inline-block";
-          adsContainer.style.display = "none"; // premiumda reklam gizle
+        if (doc.exists) {
+          const data = doc.data();
+          coins = data.coins || 0;
+          premiumUntil = data.premiumUntil || 0;
         } else {
-          premiumLabel.style.display = "none";
-          adsContainer.style.display = "block";
-          loadAdsenseScript();
+          coins = 0;
+          premiumUntil = 0;
+          await userDocRef.set({ coins, premiumUntil });
         }
+        updateCoinsDisplay();
+        checkPremium();
 
-        coinsSpan.textContent = coins + " Coin";
-
-        userInfoDiv.style.display = "flex";
-
-        // Her dakika 2 coin ver (60.000 ms)
-        if (coinInterval) clearInterval(coinInterval);
-        coinInterval = setInterval(async () => {
-          coins += 2;
-          coinsSpan.textContent = coins + " Coin";
-
-          // Firestore güncelle
-          await userDocRef.set({ coins }, { merge: true });
-
-          // 200 coin oldu mu premium ver
-          if (coins >= 200 && premiumUntil <= now) {
-            // 2 hafta premium ver
-            premiumUntil = now + 14 * 24 * 60 * 60 * 1000; // 14 gün milisaniye
-            await userDocRef.set({ premiumUntil }, { merge: true });
-            premiumLabel.style.display = "inline-block";
-            adsContainer.style.display = "none";
-            // Reklam scripti varsa kaldır (isteğe bağlı)
-            console.log("Premium aktif oldu.");
+        // Her dakika coin +1 ekle (premium ise 2 kat hızlı olabilir mesela)
+        setInterval(async () => {
+          const now = Date.now();
+          if (premiumUntil > now) {
+            coins += 2;
+          } else {
+            coins += 1;
           }
-        }, 60 * 1000); // 1 dakika
+          await userDocRef.set({ coins }, { merge: true });
+          updateCoinsDisplay();
+        }, 60000);
 
       } else {
-        // Kullanıcı giriş yapmamış
-        userInfoDiv.style.display = "none";
-        adsContainer.style.display = "block";
-        loadAdsenseScript();
-
-        if (coinInterval) clearInterval(coinInterval);
+        userInfoDiv.style.display = 'none';
+        coinsSpan.style.display = 'none';
+        buyPremiumBtn.style.display = 'none';
+        document.getElementById('ad-container').style.display = 'flex';
       }
     });
 
-    // Çıkış yapma fonksiyonu
+    buyPremiumBtn.onclick = async () => {
+      if (!userDocRef) {
+        alert("Lütfen önce giriş yapınız!");
+        return;
+      }
+
+      if (coins >= 500) {
+        coins -= 500;
+        const now = Date.now();
+        premiumUntil = premiumUntil > now
+          ? premiumUntil + 14 * 24 * 60 * 60 * 1000
+          : now + 14 * 24 * 60 * 60 * 1000;
+        await userDocRef.set({ coins, premiumUntil }, { merge: true });
+        updateCoinsDisplay();
+        checkPremium();
+        alert("Tebrikler! 14 gün premium satın aldınız.");
+      } else {
+        alert("Yeterli coininiz yok!");
+      }
+    };
+
     function signOut() {
-      auth.signOut().then(() => {
-        window.location.href = "/index.html";
-      });
+      auth.signOut();
+      location.reload();
     }
 
-    // Sayfa yüklendiğinde tema uygula
-    window.onload = function () {
-      const theme = getCookie("theme") || "dark";
+    // Tema yüklenirken cookie kontrolü
+    window.onload = () => {
+      const theme = getCookie("theme") || "light";
       document.body.classList.add(theme + "-mode");
     };
   </script>
-
 </body>
 </html>
