@@ -127,7 +127,7 @@
       background-color: #36d646;
     }
 
-    /* Kullanıcı adı ve çıkış butonu alanı */
+    /* Kullanıcı adı, coin ve çıkış butonu alanı */
     #user-info {
       position: fixed;
       top: 10px;
@@ -139,10 +139,14 @@
       border-radius: 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       z-index: 1000;
       font-size: 16px;
       user-select: none;
+    }
+
+    #user-info span {
+      white-space: nowrap;
     }
 
     #user-info button {
@@ -159,52 +163,6 @@
     #user-info button:hover {
       background-color: #e04b4b;
     }
-
-    /* Coin ve premium alanı */
-    #coins-display {
-      position: fixed;
-      top: 10px;
-      left: 200px;
-      color: gold;
-      font-weight: bold;
-      font-size: 18px;
-      background-color: rgba(0,0,0,0.4);
-      padding: 8px 12px;
-      border-radius: 8px;
-      z-index: 1000;
-      user-select: none;
-    }
-
-    #buyPremiumBtn {
-      position: fixed;
-      top: 10px;
-      left: 350px;
-      padding: 8px 15px;
-      font-size: 16px;
-      border-radius: 8px;
-      background-color: #cc1d1d;
-      color: white;
-      border: none;
-      cursor: pointer;
-      z-index: 1000;
-      user-select: none;
-      transition: background-color 0.3s;
-    }
-
-    #buyPremiumBtn:hover {
-      background-color: #e04b4b;
-    }
-
-    /* Reklam alanı */
-    #ad-container {
-      margin-top: 20px;
-      width: 100%;
-      max-width: 728px;
-      height: 90px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
   </style>
 </head>
 <body>
@@ -216,11 +174,9 @@
 
   <div id="user-info" style="display:none;">
     <span id="displayName"></span>
+    <span id="coinCount">0 Coin</span>
     <button onclick="signOut()">Çıkış Yap</button>
   </div>
-
-  <div id="coins-display" style="display:none;">0 Coin</div>
-  <button id="buyPremiumBtn">Premium Satın Al (500 Coin)</button>
 
   <h2>Bedava Oyun :)🎮</h2>
 
@@ -238,17 +194,6 @@
     <a href="/sayfa2/paperminecraft" class="menu-item">Paper Minecraft</a>
     <a href="/sayfa2/retro" class="menu-item">Retro Cars</a>
     <a href="/games/home.html" class="menu-item1">Diğer Oyunlar (minecraft var)</a>
-  </div>
-
-  <div id="ad-container">
-    <!-- Google Adsense reklam alanı -->
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:728px;height:90px"
-         data-ad-client="ca-pub-8243937357954026"
-         data-ad-slot="1234567890"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
   </div>
 
   <!-- Firebase SDK'lar -->
@@ -287,108 +232,70 @@
       document.cookie = "theme=" + next + "; path=/; max-age=31536000";
     }
 
-    let userDocRef = null;
+    let userDocRef;
     let coins = 0;
-    let premiumUntil = 0;
-    const coinsSpan = document.getElementById('coins-display');
-    const buyPremiumBtn = document.getElementById('buyPremiumBtn');
+    let user;
 
     function updateCoinsDisplay() {
-      coinsSpan.textContent = coins + " Coin";
+      document.getElementById('coinCount').textContent = coins + ' Coin';
     }
 
-    function checkPremium() {
-      const now = Date.now();
-      if (premiumUntil > now) {
-        // Premium aktif: Reklamları gizle
-        document.getElementById('ad-container').style.display = "none";
-        buyPremiumBtn.textContent = "Premium Aktif 🎉";
-        buyPremiumBtn.disabled = true;
-        buyPremiumBtn.style.backgroundColor = "#4CAF50"; // yeşil
-      } else {
-        // Premium yoksa reklam göster
-        document.getElementById('ad-container').style.display = "flex";
-        buyPremiumBtn.textContent = "Premium Satın Al (500 Coin)";
-        buyPremiumBtn.disabled = false;
-        buyPremiumBtn.style.backgroundColor = "#cc1d1d";
-      }
-    }
-
-    auth.onAuthStateChanged(async (user) => {
-      const userInfoDiv = document.getElementById('user-info');
-      const displayNameSpan = document.getElementById('displayName');
-
-      if (user) {
-        displayNameSpan.textContent = user.displayName || user.email;
-        userInfoDiv.style.display = 'flex';
-        coinsSpan.style.display = 'inline-block';
-
-        userDocRef = db.collection('users').doc(user.uid);
-
-        const doc = await userDocRef.get();
-        if (doc.exists) {
-          const data = doc.data();
-          coins = data.coins || 0;
-          premiumUntil = data.premiumUntil || 0;
-        } else {
-          coins = 0;
-          premiumUntil = 0;
-          await userDocRef.set({ coins, premiumUntil });
-        }
-        updateCoinsDisplay();
-        checkPremium();
-
-        // Her dakika coin +1 ekle (premium ise 2 kat hızlı olabilir mesela)
-        setInterval(async () => {
-          const now = Date.now();
-          if (premiumUntil > now) {
-            coins += 2;
-          } else {
-            coins += 1;
-          }
-          await userDocRef.set({ coins }, { merge: true });
-          updateCoinsDisplay();
-        }, 60000);
-
-      } else {
-        userInfoDiv.style.display = 'none';
-        coinsSpan.style.display = 'none';
-        buyPremiumBtn.style.display = 'none';
-        document.getElementById('ad-container').style.display = 'flex';
-      }
-    });
-
-    buyPremiumBtn.onclick = async () => {
-      if (!userDocRef) {
-        alert("Lütfen önce giriş yapınız!");
-        return;
-      }
-
-      if (coins >= 500) {
-        coins -= 500;
-        const now = Date.now();
-        premiumUntil = premiumUntil > now
-          ? premiumUntil + 14 * 24 * 60 * 60 * 1000
-          : now + 14 * 24 * 60 * 60 * 1000;
-        await userDocRef.set({ coins, premiumUntil }, { merge: true });
-        updateCoinsDisplay();
-        checkPremium();
-        alert("Tebrikler! 14 gün premium satın aldınız.");
-      } else {
-        alert("Yeterli coininiz yok!");
-      }
-    };
-
-    function signOut() {
-      auth.signOut();
-      location.reload();
-    }
-
-    // Tema yüklenirken cookie kontrolü
-    window.onload = () => {
-      const theme = getCookie("theme") || "light";
+    window.onload = function () {
+      const theme = getCookie("theme") || "dark";
       document.body.classList.add(theme + "-mode");
+
+      auth.onAuthStateChanged(async (u) => {
+        user = u;
+        const userInfoDiv = document.getElementById('user-info');
+        const displayNameSpan = document.getElementById('displayName');
+
+        if (user) {
+          displayNameSpan.textContent = user.displayName || user.email;
+          userInfoDiv.style.display = 'flex';
+
+          userDocRef = db.collection('users').doc(user.uid);
+          const userDoc = await userDocRef.get();
+
+          if (!userDoc.exists) {
+            // Kullanıcı dokümanı yoksa oluştur
+            await userDocRef.set({
+              coins: 0,
+              premiumUntil: null
+            });
+            coins = 0;
+          } else {
+            coins = userDoc.data().coins || 0;
+          }
+
+          updateCoinsDisplay();
+
+          // Her dakika 1 coin artır (admin hariç)
+          setInterval(async () => {
+            if ((user.displayName || user.email) === 'admin') {
+              // Admin kullanıcısına coin verme
+              coins = 0;
+              updateCoinsDisplay();
+              return;
+            }
+
+            coins += 1; // Premium veya değil herkes 1 coin alıyor
+            await userDocRef.update({ coins: coins });
+            updateCoinsDisplay();
+          }, 60000); // 60000ms = 1 dakika
+
+        } else {
+          userInfoDiv.style.display = 'none';
+        }
+      });
     };
+
+    // Çıkış yapma fonksiyonu
+    function signOut() {
+      auth.signOut().then(() => {
+        window.location.href = "/index.html"; // Çıkış sonrası ana sayfa yenile
+      });
+    }
   </script>
+
 </body>
 </html>
