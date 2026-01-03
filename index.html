@@ -5,271 +5,202 @@
   <meta charset="UTF-8" />
   <link rel="icon" href="ps.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GameSitesi | Pro</title>
+  <title>GameSitesi | Pro Portal</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
-    :root {
-      --bg-dark: #0a0a0a;
-      --sidebar-dark: #121212;
-      --card-dark: #181818;
-      --text-dark: #ffffff;
-      --accent-color: #36d646;
-      --sidebar-width: 260px;
+    :root { 
+      --bg-dark: #0a0a0a; 
+      --sidebar-dark: #121212; 
+      --card-dark: #181818; 
+      --text-dark: #ffffff; 
+      --accent-color: #36d646; 
+      --sidebar-width: 260px; 
     }
 
+    /* TEMA SINIFLARI */
+    body.tema-neon-yesil { --accent-color: #36d646; }
+    body.tema-gece-mavisi { --accent-color: #007bff; }
+    body.tema-altin { --accent-color: #ffcc00; }
+    
     * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { margin: 0; display: flex; background-color: var(--bg-dark); color: var(--text-dark); overflow-x: hidden; }
 
-    body {
-      margin: 0;
-      display: flex;
-      min-height: 100vh;
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
+    /* GİRİŞ ZORUNLULUĞU POPUP */
+    #login-overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.95); z-index: 9999; 
+      display: none; align-items: center; justify-content: center; 
+    }
+    .login-box { 
+      background: #181818; padding: 40px; border-radius: 25px; 
+      border: 2px solid var(--accent-color); text-align: center; 
+      max-width: 400px; width: 90%; box-shadow: 0 0 30px rgba(54, 214, 70, 0.2);
     }
 
-    /* --- SIDEBAR --- */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: var(--sidebar-dark);
-      border-right: 1px solid #222;
-      height: 100vh;
-      position: fixed;
-      left: 0; top: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      z-index: 1001;
+    /* REKLAM ALANLARI */
+    .ads-container {
+      width: 100%; background: #111; border: 1px dashed #444; border-radius: 15px;
+      margin-bottom: 30px; display: flex; align-items: center; justify-content: center;
+      min-height: 120px; color: #666; font-size: 14px; text-transform: uppercase;
     }
+    .mid-ads { margin: 40px 0; min-height: 150px; border-color: var(--accent-color); opacity: 0.6; }
 
+    /* SIDEBAR */
+    .sidebar { 
+      width: var(--sidebar-width); background: var(--sidebar-dark); 
+      border-right: 1px solid #222; height: 100vh; position: fixed; 
+      padding: 20px; display: flex; flex-direction: column; z-index: 1001; 
+    }
     .sidebar h2 { color: var(--accent-color); text-align: center; margin-bottom: 25px; }
-
-    .sidebar a {
-      color: #999; text-decoration: none; padding: 12px; margin: 5px 0;
-      display: flex; align-items: center; gap: 10px; border-radius: 10px;
-      transition: 0.3s; cursor: pointer; font-size: 15px;
+    .sidebar a { 
+      color: #999; text-decoration: none; padding: 12px; margin: 5px 0; 
+      display: flex; align-items: center; gap: 12px; border-radius: 12px; transition: 0.3s; 
     }
-
-    .sidebar a:hover { background: #1f1f1f; color: var(--accent-color); }
-
-    .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #222; }
-
-    #user-panel {
-      background: #1a1a1a; padding: 15px; border-radius: 12px;
-      margin-bottom: 10px; display: none; flex-direction: column; gap: 8px;
-      border: 1px solid #333;
-    }
-
-    .user-name { font-weight: 600; color: var(--accent-color); font-size: 14px; }
+    .sidebar a:hover, .sidebar a.active { background: #1f1f1f; color: var(--accent-color); }
     
-    .coin-box {
-      background: #000; padding: 8px; border-radius: 8px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 13px;
+    /* PROFIL */
+    .user-profile { background: #1a1a1a; padding: 18px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; display: none; }
+    .user-name-row { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .xp-bar-bg { width: 100%; height: 8px; background: #333; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+    #xp-progress { width: 0%; height: 100%; background: var(--accent-color); transition: 1s ease; }
+
+    /* ANA ICERIK */
+    .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 30px; }
+
+    /* ÇARK */
+    .wheel-box { 
+      background: var(--card-dark); padding: 30px; border-radius: 25px; 
+      border: 1px solid #222; display: flex; flex-direction: column; 
+      align-items: center; margin-bottom: 40px; 
+    }
+    .wheel-wrap { 
+      position: relative; width: 220px; height: 220px; 
+      border: 8px solid #222; border-radius: 50%; 
+      background: conic-gradient(#36d646 0deg 72deg, #007bff 72deg 144deg, #ffcc00 144deg 216deg, #ff4d4d 216deg 288deg, #9b59b6 288deg 360deg);
+      transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+    }
+    .wheel-pointer {
+      width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+      border-top: 25px solid white; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10;
     }
 
-    .logout-btn {
-      background: #cc1d1d; color: white; border: none; padding: 10px;
-      border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%;
-    }
-
-    /* --- ANA İÇERİK --- */
-    .main-content {
-      margin-left: var(--sidebar-width); flex: 1; padding: 30px;
-      width: calc(100% - var(--sidebar-width));
-    }
-
-    .search-box { width: 100%; max-width: 800px; margin-bottom: 30px; position: relative; }
-    .search-box input {
-      width: 100%; padding: 15px 50px; border-radius: 15px; border: 1px solid #333;
-      background: var(--card-dark); color: white; outline: none; font-size: 16px;
-    }
-    .search-box i { position: absolute; left: 20px; top: 18px; color: var(--accent-color); }
-
-    .ad-container { width: 100%; margin: 20px 0; text-align: center; background: rgba(255,255,255,0.02); border-radius: 10px; min-height: 100px; }
-
+    /* OYUN KARTLARI */
     .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .game-card { background: var(--card-dark); border-radius: 18px; overflow: hidden; transition: 0.4s; text-decoration: none; color: inherit; border: 1px solid #222; height: 380px; }
+    .game-card:hover { transform: translateY(-8px); border-color: var(--accent-color); }
+    .game-card img { width: 100%; height: 160px; object-fit: cover; }
+    .game-info { padding: 15px; }
 
-    .game-card {
-      background: var(--card-dark); border-radius: 18px; overflow: hidden;
-      transition: 0.4s; text-decoration: none; color: inherit;
-      border: 1px solid #222; display: flex; flex-direction: column;
-      height: 400px;
-    }
-    
-    .game-card:hover { transform: translateY(-8px); border-color: var(--accent-color); box-shadow: 0 10px 20px rgba(54, 214, 70, 0.1); }
-    .game-card img { width: 100%; height: 180px; object-fit: cover; }
-
-    .game-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-    .game-info h3 { margin: 0; font-size: 16px; color: var(--accent-color); font-weight: 600; }
-    .game-info p { margin: 8px 0; font-size: 13px; color: #bbb; line-height: 1.4; flex-grow: 1; overflow: hidden; }
-    .game-tag { font-size: 11px; color: #666; font-weight: bold; text-transform: uppercase; border-top: 1px solid #222; padding-top: 10px; }
+    /* ENVANTER MODAL */
+    #inventory-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; }
+    .inventory-box { background: #181818; padding: 30px; border-radius: 20px; border: 1px solid var(--accent-color); width: 90%; max-width: 450px; text-align: center; }
 
     @media (max-width: 768px) {
-      .sidebar { width: 70px; padding: 10px; }
-      .sidebar h2, .sidebar span, .sidebar p { display: none; }
-      .main-content { margin-left: 70px; width: calc(100% - 70px); }
+      .sidebar { width: 70px; }
+      .sidebar h2, .sidebar span { display: none; }
+      .main-content { margin-left: 70px; }
     }
   </style>
-  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026" crossorigin="anonymous"></script>
 </head>
 <body>
 
+  <div id="login-overlay">
+    <div class="login-box">
+      <h2 style="color:var(--accent-color)">Hoş Geldin Oyuncu!</h2>
+      <p style="color:#aaa; margin-bottom:25px;">Oyunlara erişmek ve günlük ödülünü almak için giriş yapmalısın.</p>
+      <button onclick="window.location.href='/giris.html'" style="background:var(--accent-color); border:none; padding:15px 30px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer; font-size:16px;">ŞİMDİ GİRİŞ YAP</button>
+      <p onclick="document.getElementById('login-overlay').style.display='none'" style="color:#555; margin-top:20px; cursor:pointer; font-size:12px; text-decoration:underline;">Daha sonra (Misafir)</p>
+    </div>
+  </div>
+
+  <div id="inventory-modal">
+    <div class="inventory-box">
+      <h2 style="color:var(--accent-color)">Envanterim</h2>
+      <div id="inventory-list"></div>
+      <button onclick="document.getElementById('inventory-modal').style.display='none'" style="margin-top:20px; background:#444; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Kapat</button>
+    </div>
+  </div>
+
   <nav class="sidebar">
     <h2>GameSitesi</h2>
-    <a href="#"><i class="fas fa-home"></i> <span>Ana Sayfa</span></a>
+    <a href="#" class="active"><i class="fas fa-home"></i> <span>Ana Sayfa</span></a>
     
-    <div style="margin-top: 15px;">
-      <p style="font-size: 11px; color: #444; padding-left: 12px; font-weight: bold;">SOSYAL</p>
-      <a href="https://www.youtube.com/@eyprosakir" target="_blank"><i class="fab fa-youtube"></i> <span>YouTube</span></a>
-      <a href="https://scratch.mit.edu" target="_blank"><i class="fas fa-code"></i> <span>Scratch</span></a>
-      <a href="https://github.com/gamesitesi" target="_blank"><i class="fab fa-github"></i> <span>GitHub</span></a>
+    <div id="sidebar-guest-view">
+      <a href="/giris.html"><i class="fas fa-sign-in-alt"></i> <span>Giriş Yap</span></a>
     </div>
 
-    <div class="sidebar-footer">
-      <a href="/giris.html" id="login-btn"><i class="fas fa-sign-in-alt"></i> <span>Giriş</span></a>
-      <div id="user-panel">
-        <span class="user-name" id="displayName">...</span>
-        <div class="coin-box"><span>Bakiye:</span><span id="coin-counter">0 💰</span></div>
-        <button onclick="signOut()" class="logout-btn">Çıkış</button>
+    <div class="user-profile" id="user-profile-box">
+      <div class="user-name-row">
+        <span id="p-name">...</span>
+        <i id="active-badge" class="fas fa-certificate" style="display:none; color:#ffcc00;"></i>
       </div>
+      <div style="font-size:11px; color:#888;" id="p-rank">Çaylak</div>
+      <div class="xp-bar-bg"><div id="xp-progress"></div></div>
+      <div style="font-size:13px; margin-top:8px; color:#ffcc00;">💰 <span id="p-coin">0</span></div>
+      <button onclick="signOut()" style="margin-top:10px; background:#cc1d1d; color:white; border:none; width:100%; padding:5px; border-radius:5px; cursor:pointer;">Çıkış</button>
+    </div>
+
+    <div style="margin-top: 15px;">
+      <a href="https://www.youtube.com/@eyprosakir" target="_blank"><i class="fab fa-youtube"></i> <span>YouTube</span></a>
+      <a href="#" onclick="openInventory()"><i class="fas fa-box-open"></i> <span>Envanterim</span></a>
+      <a href="/magaza.html"><i class="fas fa-shopping-cart"></i> <span>Mağaza</span></a>
     </div>
   </nav>
 
   <main class="main-content">
     
-    <div class="ad-container">
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8243937357954026" data-ad-slot="8455765938" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    <div class="ads-container"><span>REKLAM ALANI</span></div>
+
+    <div class="wheel-box">
+       <div style="position:relative;">
+          <div class="wheel-pointer"></div>
+          <div class="wheel-wrap" id="wheel-main"></div>
+       </div>
+       <button id="spin-btn" onclick="spinNow()" style="margin-top:20px; background:var(--accent-color); border:none; padding:10px 20px; border-radius:10px; font-weight:bold; cursor:pointer;">ÇARKIBİR ÇEVİR</button>
+       <p id="wheel-msg" style="margin-top:10px; color:var(--accent-color); font-weight:bold; min-height:20px;"></p>
     </div>
 
-    <div class="search-box">
-      <i class="fas fa-search"></i>
-      <input type="text" id="gameSearch" placeholder="Oyunlarda ara..." onkeyup="filterGames()">
+    <div class="games-grid">
+      <a href="/games/eaglercraft.1.8.8" class="game-card"><img src="https://preview.redd.it/who-else-uses-eaglercraft-v0-4mik0if38tge1.jpeg?auto=webp&s=1b46e7736db6e1ba0ba51b81df91b3f2abd13f70"><div class="game-info"><h3>Minecraft 1.8.8</h3></div></a>
+      <a href="/jmpsak" class="game-card"><img src="https://i.ytimg.com/vi/Hwbrh3wZ2h4/maxresdefault.jpg"><div class="game-info"><h3>Jumping Şakir</h3></div></a>
+      <a href="/portalania" class="game-card"><img src="https://i.hizliresim.com/c3qagy1.png"><div class="game-info"><h3>Portalania</h3></div></a>
+      <a href="/onlinecp3" class="game-card"><img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/c72f227e8752a72aaa1d0d5418706029/stickman-race.png"><div class="game-info"><h3>Stickman Race</h3></div></a>
+      <a href="/stickmanclimb" class="game-card"><img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/3c338d4afffa6a269b9642efef13f5ca/stickman-climb-2.png"><div class="game-info"><h3>Stickman Climb</h3></div></a>
+      <a href="/sayfa2/appelsec" class="game-card"><img src="https://www.speedrun.com/static/game/ldewn2jd/cover.png?v=ca91491"><div class="game-info"><h3>Appel</h3></div></a>
+      <a href="/sayfa2/bsgame" class="game-card"><img src="https://i.scdn.co/image/ab6761610000e5ebf7b952107c126c561c52171e"><div class="game-info"><h3>Coding Wars</h3></div></a>
+      <a href="/sayfa2/fc25" class="game-card"><img src="https://shikogamestore.com/wp-content/uploads/2025/07/516863326_1301231364696535_2827501892350202698_n.jpg"><div class="game-info"><h3>FC25 Pack</h3></div></a>
     </div>
 
-    <div class="games-grid" id="gamesGrid">
-      
-      <a href="/games/eaglercraft.1.8.8" class="game-card">
-        <img src="https://preview.redd.it/who-else-uses-eaglercraft-v0-4mik0if38tge1.jpeg?auto=webp&s=1b46e7736db6e1ba0ba51b81df91b3f2abd13f70">
-        <div class="game-info"><h3>Minecraft 1.8.8</h3><p>Efsanevi blok dünyasında hayatta kal ve kendi krallığını kur.</p><span class="game-tag">Survival</span></div>
-      </a>
+    <div class="ads-container mid-ads"><span>ARA REKLAM ALANI</span></div>
 
-      <a href="/jmpsak" class="game-card">
-        <img src="https://i.ytimg.com/vi/Hwbrh3wZ2h4/maxresdefault.jpg">
-        <div class="game-info"><h3>Jumping Şakir</h3><p>Kral Şakir ile en yükseğe zıpla, engellerden kaç ve rekoru kır!</p><span class="game-tag">Arcade</span></div>
-      </a>
-
-      <a href="/portalania" class="game-card">
-        <img src="https://i.hizliresim.com/c3qagy1.png">
-        <div class="game-info"><h3>Portalania</h3><p>Boyutlar arası kapıları kullanarak karmaşık bulmacaları çözmeye hazır ol.</p><span class="game-tag">Bulmaca</span></div>
-      </a>
-
-      <a href="/onlinecp3" class="game-card">
-        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/c72f227e8752a72aaa1d0d5418706029/stickman-race.png">
-        <div class="game-info"><h3>Stickman Race</h3><p>Rakiplerini geçmek için doğru zamanda zıpla ve en hızlı çöp adam ol.</p><span class="game-tag">Yarış</span></div>
-      </a>
-
-      <a href="/stickmanclimb" class="game-card">
-        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/3c338d4afffa6a269b9642efef13f5ca/stickman-climb-2.png">
-        <div class="game-info"><h3>Stickman Climb</h3><p>Çekiçle tırmanmak hiç bu kadar zor olmamıştı! Sabrını test et.</p><span class="game-tag">Zorlayıcı</span></div>
-      </a>
-
-      <a href="/sayfa2/appelsec" class="game-card">
-        <img src="https://www.speedrun.com/static/game/ldewn2jd/cover.png?v=ca91491">
-        <div class="game-info"><h3>Appel</h3><p>Gezegenleri keşfet, engelleri aş ve bu epik platform macerasını bitir.</p><span class="game-tag">Platform</span></div>
-      </a>
-
-      <a href="/sayfa2/bsgame" class="game-card">
-        <img src="https://i.scdn.co/image/ab6761610000e5ebf7b952107c126c561c52171e">
-        <div class="game-info"><h3>Coding Wars</h3><p>Yazılım dünyasında savaş başlasın! Kodlarını konuştur ve kazan.</p><span class="game-tag">Strateji</span></div>
-      </a>
-
-      <a href="/sayfa2/fc25" class="game-card">
-        <img src="https://shikogamestore.com/wp-content/uploads/2025/07/516863326_1301231364696535_2827501892350202698_n.jpg">
-        <div class="game-info"><h3>FC25 Pack Opening</h3><p>Şansını dene ve hayalindeki futbol kadrosunu paket açarak oluştur.</p><span class="game-tag">Simülasyon</span></div>
-      </a>
-
-      <a href="/sayfa2/paperminecraft" class="game-card">
-        <img src="https://img.itch.zone/aW1nLzEyODU0NDA0LnBuZw==/original/asbVhs.png">
-        <div class="game-info"><h3>Paper Minecraft</h3><p>Minecraft'ın kağıt üzerindeki 2D dünyasına hoş geldin!</p><span class="game-tag">2D Creative</span></div>
-      </a>
-
-      <a href="/2048" class="game-card">
-        <img src="https://love2dev.com/img/2048-logo-600x310-600x311.png">
-        <div class="game-info"><h3>2048</h3><p>Sayıları birleştirerek 2048 karesine ulaşmaya çalışan bir zihin oyunu.</p><span class="game-tag">Zeka</span></div>
-      </a>
-
-      <a href="/sayfa2/retro" class="game-card">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3AGiykyDka501MbQl-e4AgCTKAMgow18nzA&s">
-        <div class="game-info"><h3>Retro Cars</h3><p>Eski tarz arabalarla nostaljik ve hızlı bir yarışa katıl.</p><span class="game-tag">Araba</span></div>
-      </a>
-
-      <a href="/pinpon" class="game-card">
-        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/c02dcbba0cc309d178806541248df443/ping-pong-go.png">
-        <div class="game-info"><h3>Pinpon</h3><p>Klasik tenis heyecanını dijital dünyada yaşa.</p><span class="game-tag">Spor</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/eaglercraft.1.8.8.html" class="game-card">
-        <img src="https://preview.redd.it/who-else-uses-eaglercraft-v0-4mik0if38tge1.jpeg?auto=webp&s=1b46e7736db6e1ba0ba51b81df91b3f2abd13f70">
-        <div class="game-info"><h3>3D MineCraft</h3><p>Gerçekten Minecraft! Browser üzerinde tam performans macera.</p><span class="game-tag">Macera</span></div>
-      </a>
-
-      <a href="/games/uno" class="game-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/UNO_Logo.svg/640px-UNO_Logo.svg.png">
-        <div class="game-info"><h3>UNO ONLINE</h3><p>Online rakiplere karşı kartlarını bitir ve masanın kazananı ol.</p><span class="game-tag">Kart</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/block_wall_destroyer" class="game-card">
-        <img src="https://imgs.crazygames.com/block-wall-destroyer_16x9/20250602093150/block-wall-destroyer_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop">
-        <div class="game-info"><h3>Block War Destroyer</h3><p>Önündeki tüm blok duvarlarını parçala ve yolu aç!</p><span class="game-tag">Aksiyon</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/find_the_pets" class="game-card">
-        <img src="https://i.ytimg.com/vi/9e-jiMb3gt4/maxresdefault.jpg">
-        <div class="game-info"><h3>Find The Pets</h3><p>Görsellerin arasına gizlenmiş sevimli dostlarımızı bul.</p><span class="game-tag">Gizli Obje</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/car_sky_survival" class="game-card">
-        <img src="https://imgs.crazygames.com/car-sky-survival_16x9/20250623083121/car-sky-survival_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop">
-        <div class="game-info"><h3>Car Sky Survival</h3><p>Gökyüzündeki dar yollarda arabanla hayatta kalmaya çalış.</p><span class="game-tag">Sürüş</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/crazycars" class="game-card">
-        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/2bc8004fcbb4387908a636e2a9d9ab4a/crazy-cars.png">
-        <div class="game-info"><h3>Crazy Cars</h3><p>Pistin tozunu attıracak en çılgın arabaları kullan.</p><span class="game-tag">Hız</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/omnom.html" class="game-card">
-        <img src="https://imgs.crazygames.com/games/om-nom-run/cover_16x9-1707829613214.png?metadata=none&quality=60&width=1200&height=630&fit=crop">
-        <div class="game-info"><h3>Om Nom Run</h3><p>Om Nom ile durmadan koş ve toplayabildiğin kadar şeker topla.</p><span class="game-tag">Runner</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/goescape.html" class="game-card">
-        <img src="https://games.lol/wp-content/uploads/2023/04/go-escape-pc-full-version.jpg">
-        <div class="game-info"><h3>Go Escape</h3><p>Kaçış yolunu bulmak için topu ustalıkla fırlat.</p><span class="game-tag">Beceri</span></div>
-      </a>
-
-      <a href="https://gamesitesi.github.io/games/shoot_goal/index.html" class="game-card">
-        <img src="https://play-lh.googleusercontent.com/9KIzrqc0qcQQQbdyLrL7BbNlYJO7EYGKDJawH5BYkZT_KRb_9_lGNLz-A1foSm4blA=w526-h296-rw">
-        <div class="game-info"><h3>Shoot Goal!</h3><p>Kaleciyi geç ve topu tam doksana gönder!</p><span class="game-tag">Futbol</span></div>
-      </a>
-
-
+    <div class="games-grid">
+      <a href="/sayfa2/paperminecraft" class="game-card"><img src="https://img.itch.zone/aW1nLzEyODU0NDA0LnBuZw==/original/asbVhs.png"><div class="game-info"><h3>Paper Minecraft</h3></div></a>
+      <a href="/2048" class="game-card"><img src="https://love2dev.com/img/2048-logo-600x310-600x311.png"><div class="game-info"><h3>2048</h3></div></a>
+      <a href="/sayfa2/retro" class="game-card"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3AGiykyDka501MbQl-e4AgCTKAMgow18nzA&s"><div class="game-info"><h3>Retro Cars</h3></div></a>
+      <a href="/pinpon" class="game-card"><img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/c02dcbba0cc309d178806541248df443/ping-pong-go.png"><div class="game-info"><h3>Pinpon</h3></div></a>
+      <a href="/games/uno" class="game-card"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/UNO_Logo.svg/640px-UNO_Logo.svg.png"><div class="game-info"><h3>UNO ONLINE</h3></div></a>
+      <a href="https://gamesitesi.github.io/games/block_wall_destroyer" class="game-card"><img src="https://imgs.crazygames.com/block-wall-destroyer_16x9/20250602093150/block-wall-destroyer_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop"><div class="game-info"><h3>Block War</h3></div></a>
+      <a href="https://gamesitesi.github.io/games/find_the_pets" class="game-card"><img src="https://i.ytimg.com/vi/9e-jiMb3gt4/maxresdefault.jpg"><div class="game-info"><h3>Find Pets</h3></div></a>
+      <a href="https://gamesitesi.github.io/games/car_sky_survival" class="game-card"><img src="https://imgs.crazygames.com/car-sky-survival_16x9/20250623083121/car-sky-survival_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop"><div class="game-info"><h3>Sky Survival</h3></div></a>
     </div>
 
-    <div class="ad-container">
-      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8243937357954026" data-ad-slot="8455765938" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    <div class="ads-container mid-ads"><span>ARA REKLAM ALANI</span></div>
+
+    <div class="games-grid">
+      <a href="https://gamesitesi.github.io/crazycars" class="game-card"><img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/2bc8004fcbb4387908a636e2a9d9ab4a/crazy-cars.png"><div class="game-info"><h3>Crazy Cars</h3></div></a>
+      <a href="https://gamesitesi.github.io/games/omnom.html" class="game-card"><img src="https://imgs.crazygames.com/games/om-nom-run/cover_16x9-1707829613214.png?metadata=none&quality=60&width=1200&height=630&fit=crop"><div class="game-info"><h3>Om Nom Run</h3></div></a>
+      <a href="https://gamesitesi.github.io/games/goescape.html" class="game-card"><img src="https://games.lol/wp-content/uploads/2023/04/go-escape-pc-full-version.jpg"><div class="game-info"><h3>Go Escape</h3></div></a>
+      <a href="https://gamesitesi.github.io/games/shoot_goal/index.html" class="game-card"><img src="https://i.ytimg.com/vi/M4_ptMRwoDM/maxresdefault.jpg"><div class="game-info"><h3>Shoot Goal!</h3></div></a>
     </div>
 
   </main>
-
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -284,35 +215,74 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function filterGames() {
-      let input = document.getElementById('gameSearch').value.toLowerCase();
-      let cards = document.getElementsByClassName('game-card');
-      for (let card of cards) {
-        let title = card.querySelector('h3').innerText.toLowerCase();
-        card.style.display = title.includes(input) ? "" : "none";
-      }
-    }
-
     function signOut() { auth.signOut().then(() => location.reload()); }
 
     auth.onAuthStateChanged(user => {
-      const userPanel = document.getElementById("user-panel");
-      const loginBtn = document.getElementById("login-btn");
+      const userProfile = document.getElementById("user-profile-box");
+      const guestView = document.getElementById("sidebar-guest-view");
+      const loginOverlay = document.getElementById("login-overlay");
+
       if (user) {
-        loginBtn.style.display = "none";
-        userPanel.style.display = "flex";
-        const name = user.displayName || user.email.split("@")[0];
-        document.getElementById("displayName").textContent = name;
-        const userDocRef = db.collection("users").doc(user.uid);
-        userDocRef.get().then(doc => {
-          let coin = doc.exists ? doc.data().coin : 0;
-          document.getElementById("coin-counter").textContent = (name.toLowerCase() === "admin" ? "∞" : coin) + " 💰";
+        loginOverlay.style.display = "none";
+        guestView.style.display = "none";
+        userProfile.style.display = "block";
+        db.collection("users").doc(user.uid).onSnapshot(doc => {
+          if(doc.exists) {
+            const data = doc.data();
+            document.getElementById("p-name").textContent = user.displayName || user.email.split("@")[0];
+            document.getElementById("p-coin").textContent = data.coin || 0;
+            document.getElementById('xp-progress').style.width = (data.xp % 1000) / 10 + "%";
+            document.getElementById('p-rank').innerText = data.xp >= 2000 ? "Efsane" : (data.xp >= 500 ? "Pro" : "Çaylak");
+            if(data.activeTheme) document.body.className = data.activeTheme;
+          }
         });
       } else {
-        loginBtn.style.display = "flex";
-        userPanel.style.display = "none";
+        loginOverlay.style.display = "flex"; // Giriş yapılmamışsa popup göster
       }
     });
+
+    async function openInventory() {
+      const user = auth.currentUser;
+      if(!user) return alert("Giriş yapmalısın!");
+      document.getElementById('inventory-modal').style.display = 'flex';
+      const list = document.getElementById('inventory-list');
+      const doc = await db.collection("users").doc(user.uid).get();
+      const inv = doc.data().inventory || [];
+      list.innerHTML = inv.length ? "" : "Henüz bir şey satın almamışsın.";
+      inv.forEach(item => {
+        list.innerHTML += `<div style="background:#222; margin:10px; padding:10px; border-radius:10px; display:flex; justify-content:space-between;"><span>${item.name}</span><button onclick="useItem('${item.type}','${item.icon}','${item.name}')" style="background:var(--accent-color); border:none; border-radius:5px; cursor:pointer;">Kullan</button></div>`;
+      });
+    }
+
+    async function useItem(type, icon, name) {
+      const user = auth.currentUser;
+      if(type === 'rozet') await db.collection("users").doc(user.uid).update({ activeBadge: icon });
+      else {
+        let tClass = "tema-" + name.toLowerCase().replace(" ", "-").replace("ş","s").replace("ü","u").replace("ı","i");
+        await db.collection("users").doc(user.uid).update({ activeTheme: tClass });
+      }
+      alert(name + " aktif edildi!");
+      location.reload();
+    }
+
+    function spinNow() {
+      const user = auth.currentUser;
+      if(!user) return alert("Giriş yapmalısın!");
+      const btn = document.getElementById('spin-btn');
+      const wheel = document.getElementById('wheel-main');
+      btn.disabled = true;
+      let deg = Math.floor(5000 + Math.random() * 5000);
+      wheel.style.transform = `rotate(${deg}deg)`;
+      setTimeout(async () => {
+        const win = [5, 10, 20, 50, 100][Math.floor(Math.random()*5)];
+        await db.collection("users").doc(user.uid).update({
+          coin: firebase.firestore.FieldValue.increment(win),
+          xp: firebase.firestore.FieldValue.increment(50)
+        });
+        document.getElementById('wheel-msg').innerText = `Tebrikler: ${win} Coin Kazandın!`;
+        btn.disabled = false;
+      }, 4000);
+    }
   </script>
 </body>
 </html>
