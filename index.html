@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GameSitesi | Pro Portal</title>
   
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026" crossorigin="anonymous"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -32,10 +34,6 @@
     * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { margin: 0; display: flex; background-color: var(--bg-dark); color: var(--text-dark); overflow-x: hidden; transition: 0.5s; }
 
-    /* GİRİŞ ZORUNLULUĞU */
-    #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
-    .login-box { background: #181818; padding: 40px; border-radius: 25px; border: 2px solid var(--accent-color); text-align: center; max-width: 400px; width: 90%; box-shadow: 0 0 30px var(--accent-color); }
-
     /* SIDEBAR */
     .sidebar { width: var(--sidebar-width); background: var(--sidebar-dark); border-right: 1px solid #222; height: 100vh; position: fixed; padding: 20px; display: flex; flex-direction: column; z-index: 1001; }
     .sidebar h2 { color: var(--accent-color); text-align: center; margin-bottom: 25px; }
@@ -51,8 +49,7 @@
 
     /* ANA ICERIK */
     .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 30px; }
-    .ads-container { width: 100%; background: #111; border: 1px dashed #444; border-radius: 15px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; min-height: 120px; color: #666; font-size: 14px; text-transform: uppercase; }
-    .mid-ads { margin: 40px 0; min-height: 150px; border-color: var(--accent-color); opacity: 0.6; }
+    .ad-container { width: 100%; text-align: center; margin: 20px 0; min-height: 100px; }
 
     /* ÇARK */
     .wheel-box { background: var(--card-dark); padding: 30px; border-radius: 25px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; }
@@ -61,12 +58,10 @@
     /* OYUNLAR */
     .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
     .game-card { background: var(--card-dark); border-radius: 18px; overflow: hidden; transition: 0.4s; text-decoration: none; color: inherit; border: 1px solid #222; height: 380px; }
-    .game-card:hover { transform: translateY(-8px); border-color: var(--accent-color); }
     .game-card img { width: 100%; height: 160px; object-fit: cover; }
     .game-info { padding: 15px; }
     .game-info h3 { margin: 0; font-size: 16px; color: var(--accent-color); }
 
-    /* ENVANTER MODAL */
     #inventory-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; }
     .inventory-box { background: #181818; padding: 30px; border-radius: 20px; border: 1px solid var(--accent-color); width: 90%; max-width: 450px; }
     .inv-item { background: #222; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
@@ -74,31 +69,10 @@
 </head>
 <body class="tema-neon-yesil">
 
-  <div id="login-overlay">
-    <div class="login-box">
-      <h2 style="color:var(--accent-color)">Hoş Geldin!</h2>
-      <p style="color:#aaa; margin-bottom:20px;">Oyunlara erişmek ve kazanmak için giriş yap.</p>
-      <button onclick="window.location.href='/giris.html'" style="background:var(--accent-color); border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer;">ŞİMDİ GİRİŞ YAP</button>
-      <p onclick="document.getElementById('login-overlay').style.display='none'" style="color:#555; margin-top:15px; cursor:pointer; font-size:12px;">Misafir Olarak Devam Et</p>
-    </div>
-  </div>
-
-  <div id="inventory-modal">
-    <div class="inventory-box">
-      <h2 style="color:var(--accent-color); text-align:center;">Envanterim</h2>
-      <div id="inventory-list" style="max-height: 300px; overflow-y: auto;"></div>
-      <button onclick="document.getElementById('inventory-modal').style.display='none'" style="margin-top:20px; background:#444; color:white; border:none; padding:10px; width:100%; border-radius:8px; cursor:pointer;">Kapat</button>
-    </div>
-  </div>
-
   <nav class="sidebar">
     <h2>GameSitesi</h2>
     <a href="/" class="active"><i class="fas fa-home"></i> <span>Ana Sayfa</span></a>
     
-    <div id="sidebar-guest-view">
-      <a href="/giris.html"><i class="fas fa-sign-in-alt"></i> <span>Giriş Yap</span></a>
-    </div>
-
     <div class="user-profile" id="user-profile-box">
       <div class="user-name-row">
         <span id="p-name">...</span>
@@ -107,11 +81,11 @@
       <div style="font-size:11px; color:#888;" id="p-rank">Yükleniyor...</div>
       <div class="xp-bar-bg"><div id="xp-progress"></div></div>
       <div style="font-size:13px; margin-top:8px; color:#ffcc00;">💰 <span id="p-coin">0</span></div>
-      <button onclick="signOut()" style="margin-top:10px; background:#cc1d1d; color:white; border:none; width:100%; padding:5px; border-radius:5px; cursor:pointer;">Çıkış</button>
+      <button onclick="auth.signOut()" style="margin-top:10px; background:#cc1d1d; border:none; color:white; padding:5px; border-radius:5px; cursor:pointer; width:100%;">Çıkış</button>
     </div>
 
     <div style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-      <a href="/magaza.html"><i class="fas fa-shopping-cart" style="color:var(--accent-color)"></i> <span style="font-weight:bold; color:var(--accent-color)">MAĞAZA</span></a>
+      <a href="/magaza.html"><i class="fas fa-shopping-cart" style="color:var(--accent-color)"></i> <span style="font-weight:bold;">MAĞAZA</span></a>
       <a onclick="openInventory()"><i class="fas fa-box-open"></i> <span>Envanterim</span></a>
       <a href="https://www.youtube.com/@eyprosakir" target="_blank"><i class="fab fa-youtube" style="color:red"></i> <span>YouTube</span></a>
     </div>
@@ -119,14 +93,17 @@
 
   <main class="main-content">
     
-    <div class="ads-container"><span>ÜST REKLAM ALANI</span></div>
+    <div class="ad-container">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8243937357954026" data-ad-slot="8455765938" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
 
     <div class="wheel-box">
        <div style="position:relative;">
           <div style="width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:25px solid white; position:absolute; top:-15px; left:50%; transform:translateX(-50%); z-index:10;"></div>
           <div class="wheel-wrap" id="wheel-main"></div>
        </div>
-       <button id="spin-btn" onclick="spinNow()" style="margin-top:20px; background:var(--accent-color); border:none; padding:12px 25px; border-radius:12px; font-weight:bold; cursor:pointer; color:black;">ÇARKIBİR ÇEVİR</button>
+       <button id="spin-btn" onclick="spinNow()" style="margin-top:20px; background:var(--accent-color); border:none; padding:12px 25px; border-radius:12px; font-weight:bold; cursor:pointer;">ÇARKIBİR ÇEVİR</button>
        <p id="wheel-msg" style="margin-top:10px; font-weight:bold; color:var(--accent-color);"></p>
     </div>
 
@@ -141,7 +118,10 @@
       <a href="/sayfa2/fc25" class="game-card"><img src="https://shikogamestore.com/wp-content/uploads/2025/07/516863326_1301231364696535_2827501892350202698_n.jpg"><div class="game-info"><h3>FC25 Pack</h3></div></a>
     </div>
 
-    <div class="ads-container mid-ads"><span>ARA REKLAM ALANI</span></div>
+    <div class="ad-container">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8243937357954026" data-ad-slot="8455765938" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
 
     <div class="games-grid">
       <a href="/sayfa2/paperminecraft" class="game-card"><img src="https://img.itch.zone/aW1nLzEyODU0NDA0LnBuZw==/original/asbVhs.png"><div class="game-info"><h3>Paper Minecraft</h3></div></a>
@@ -154,9 +134,7 @@
       <a href="https://gamesitesi.github.io/games/car_sky_survival" class="game-card"><img src="https://imgs.crazygames.com/car-sky-survival_16x9/20250623083121/car-sky-survival_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop"><div class="game-info"><h3>Sky Survival</h3></div></a>
     </div>
 
-    <div class="ads-container mid-ads"><span>ARA REKLAM ALANI</span></div>
-
-    <div class="games-grid">
+    <div class="games-grid" style="margin-top:20px;">
       <a href="https://gamesitesi.github.io/crazycars" class="game-card"><img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/2bc8004fcbb4387908a636e2a9d9ab4a/crazy-cars.png"><div class="game-info"><h3>Crazy Cars</h3></div></a>
       <a href="https://gamesitesi.github.io/games/omnom.html" class="game-card"><img src="https://imgs.crazygames.com/games/om-nom-run/cover_16x9-1707829613214.png?metadata=none&quality=60&width=1200&height=630&fit=crop"><div class="game-info"><h3>Om Nom Run</h3></div></a>
       <a href="https://gamesitesi.github.io/games/goescape.html" class="game-card"><img src="https://games.lol/wp-content/uploads/2023/04/go-escape-pc-full-version.jpg"><div class="game-info"><h3>Go Escape</h3></div></a>
@@ -164,6 +142,14 @@
     </div>
 
   </main>
+
+  <div id="inventory-modal">
+    <div class="inventory-box">
+      <h2 style="color:var(--accent-color); text-align:center;">Envanterim</h2>
+      <div id="inventory-list" style="max-height: 300px; overflow-y: auto;"></div>
+      <button onclick="document.getElementById('inventory-modal').style.display='none'" style="margin-top:20px; background:#444; color:white; border:none; padding:10px; width:100%; border-radius:8px; cursor:pointer;">Kapat</button>
+    </div>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -178,84 +164,59 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // CANLI VERİ TAKİBİ (ROZET, TEMA, COİN)
     auth.onAuthStateChanged(user => {
       if (user) {
-        document.getElementById("login-overlay").style.display = "none";
-        document.getElementById("sidebar-guest-view").style.display = "none";
         document.getElementById("user-profile-box").style.display = "block";
-        
-        db.collection("users").doc(user.uid).onSnapshot(doc => {
+        db.collection("users").doc(user.uid).onSnapshot(async doc => {
           if(doc.exists){
             const data = doc.data();
+            // OTOMATIK ENVANTER KONTROLÜ
+            if(data.inventory === undefined) await db.collection("users").doc(user.uid).update({ inventory: [] });
+
             document.getElementById("p-name").innerText = user.displayName || user.email.split("@")[0];
             document.getElementById("p-coin").innerText = data.coin || 0;
             document.getElementById('p-rank').innerText = data.xp >= 2000 ? "Efsane" : (data.xp >= 500 ? "Pro" : "Çaylak");
             document.getElementById('xp-progress').style.width = (data.xp % 1000) / 10 + "%";
             
-            // Rozeti ismin yanına getir
             const badgeEl = document.getElementById("active-badge");
             if(data.activeBadge) {
                badgeEl.className = "fas " + data.activeBadge + " badge-icon";
                badgeEl.style.display = "inline-block";
             } else { badgeEl.style.display = "none"; }
 
-            // Temayı anında uygula
             if(data.activeTheme) document.body.className = data.activeTheme;
           }
         });
-      } else {
-        document.getElementById("login-overlay").style.display = "flex";
       }
     });
 
-    // ENVANTER SİSTEMİ
     async function openInventory() {
       const user = auth.currentUser;
       if(!user) return;
       document.getElementById('inventory-modal').style.display = 'flex';
       const list = document.getElementById('inventory-list');
-      list.innerHTML = "Yükleniyor...";
-      
       const doc = await db.collection("users").doc(user.uid).get();
       const inv = doc.data().inventory || [];
-      
-      if(inv.length === 0) {
-        list.innerHTML = "<p style='text-align:center; color:#666;'>Envanterin boş.</p>";
-        return;
-      }
-
-      list.innerHTML = "";
-      inv.forEach((item) => {
-        list.innerHTML += `
-          <div class="inv-item">
-            <span>${item.name}</span>
-            <button onclick="useItem('${item.type}','${item.icon}','${item.name}')" style="background:var(--accent-color); border:none; padding:8px; border-radius:6px; cursor:pointer; font-weight:bold;">Kullan</button>
-          </div>
-        `;
+      list.innerHTML = inv.length ? "" : "Envanter boş.";
+      inv.forEach(item => {
+        list.innerHTML += `<div class="inv-item"><span>${item.name}</span><button onclick="useItem('${item.type}','${item.icon}','${item.name}')" style="background:var(--accent-color); border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Kullan</button></div>`;
       });
     }
 
-    // EŞYA KULLANMA
     async function useItem(type, icon, name) {
       const user = auth.currentUser;
-      try {
-        if(type === 'rozet') {
-          await db.collection("users").doc(user.uid).update({ activeBadge: icon });
-        } else if(type === 'tema') {
-          let tClass = "tema-" + name.toLowerCase().replace(/\s/g, "-").replace("ş","s").replace("ü","u").replace("ı","i").replace("ö","o").replace("ç","c");
-          await db.collection("users").doc(user.uid).update({ activeTheme: tClass });
-        }
-        alert(name + " kuşanıldı!");
-      } catch (e) { alert("Hata!"); }
+      if(type === 'rozet') await db.collection("users").doc(user.uid).update({ activeBadge: icon });
+      else {
+        let tClass = "tema-" + name.toLowerCase().replace(/\s/g, "-").replace("ş","s").replace("ü","u").replace("ı","i").replace("ö","o").replace("ç","c");
+        await db.collection("users").doc(user.uid).update({ activeTheme: tClass });
+      }
+      alert(name + " kuşanıldı!");
     }
 
     function spinNow() {
       const user = auth.currentUser;
       if(!user) return;
-      const btn = document.getElementById('spin-btn');
       const wheel = document.getElementById('wheel-main');
-      btn.disabled = true;
       let deg = Math.floor(5000 + Math.random() * 5000);
       wheel.style.transform = `rotate(${deg}deg)`;
       setTimeout(async () => {
@@ -265,11 +226,8 @@
           xp: firebase.firestore.FieldValue.increment(50)
         });
         document.getElementById('wheel-msg').innerText = "Kazandın: " + win + " Coin!";
-        btn.disabled = false;
       }, 4000);
     }
-
-    function signOut() { auth.signOut().then(() => location.reload()); }
   </script>
 </body>
 </html>
