@@ -1,218 +1,277 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" href="ps.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gamesitesi</title>
-<meta property="og:image" content="https://gamesitesi.github.io/ps.ico">
-<meta property="og:title" content="GameSitesi">
-<meta property="og:description" content="Gamesitesi'nden Bedava Oyun Oyna!(valla virüssüz)">
-  <meta name="robots" content="index, follow">
+  <title>GameSitesi | Pro</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
+    :root {
+      --bg-dark: #0a0a0a;
+      --sidebar-dark: #121212;
+      --card-dark: #181818;
+      --text-dark: #ffffff;
+      --accent-color: #36d646;
+      --sidebar-width: 260px;
+    }
+
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      display: flex;
       min-height: 100vh;
-      background-color: #f0f0f0;
-      transition: background-color 0.3s, color 0.3s;
-      padding-top: 60px; /* Üstteki butonlar için boşluk */
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-dark);
+      border-right: 1px solid #222;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      z-index: 1001;
     }
 
-    body.dark-mode {
-      background-color: #1e1e1e;
-      color: white;
+    .sidebar h2 { color: var(--accent-color); text-align: center; margin-bottom: 25px; }
+
+    .sidebar a {
+      color: #999; text-decoration: none; padding: 12px; margin: 5px 0;
+      display: flex; align-items: center; gap: 10px; border-radius: 10px;
+      transition: 0.3s; cursor: pointer; font-size: 15px;
     }
 
-    body.light-mode {
-      background-color: #f0f0f0;
-      color: black;
+    .sidebar a:hover { background: #1f1f1f; color: var(--accent-color); }
+
+    .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #222; }
+
+    #user-panel {
+      background: #1a1a1a; padding: 15px; border-radius: 12px;
+      margin-bottom: 10px; display: none; flex-direction: column; gap: 8px;
+      border: 1px solid #333;
     }
 
-    .top-buttons {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
+    .user-name { font-weight: 600; color: var(--accent-color); font-size: 14px; }
+    
+    .coin-box {
+      background: #000; padding: 8px; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 13px;
     }
 
-    .top-buttons button,
-    .top-buttons a {
-      background-color: #444;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      padding: 8px 20px;
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 40px;
-      box-sizing: border-box;
-      text-decoration: none;
-      transition: background-color 0.3s;
+    .logout-btn {
+      background: #cc1d1d; color: white; border: none; padding: 10px;
+      border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%;
     }
 
-    body.light-mode .top-buttons button,
-    body.light-mode .top-buttons a {
-      background-color: #555;
-      color: white;
+    /* --- ANA İÇERİK --- */
+    .main-content {
+      margin-left: var(--sidebar-width); flex: 1; padding: 30px;
+      width: calc(100% - var(--sidebar-width));
     }
 
-    body.dark-mode .top-buttons button,
-    body.dark-mode .top-buttons a {
-      background-color: #222;
-      color: white;
+    .search-box { width: 100%; max-width: 800px; margin-bottom: 30px; position: relative; }
+    .search-box input {
+      width: 100%; padding: 15px 50px; border-radius: 15px; border: 1px solid #333;
+      background: var(--card-dark); color: white; outline: none; font-size: 16px;
     }
+    .search-box i { position: absolute; left: 20px; top: 18px; color: var(--accent-color); }
 
-    .top-buttons button:hover,
-    .top-buttons a:hover {
-      background-color: #36d646;
-      color: white;
+    .ad-container { width: 100%; margin: 20px 0; text-align: center; background: rgba(255,255,255,0.02); border-radius: 10px; min-height: 100px; }
+
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+
+    .game-card {
+      background: var(--card-dark); border-radius: 18px; overflow: hidden;
+      transition: 0.4s; text-decoration: none; color: inherit;
+      border: 1px solid #222; display: flex; flex-direction: column;
+      height: 400px;
     }
+    
+    .game-card:hover { transform: translateY(-8px); border-color: var(--accent-color); box-shadow: 0 10px 20px rgba(54, 214, 70, 0.1); }
+    .game-card img { width: 100%; height: 180px; object-fit: cover; }
 
-    .menu-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
-      max-width: 1000px;
-      width: 100%;
-      padding: 0 10px;
-      box-sizing: border-box;
-    }
+    .game-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+    .game-info h3 { margin: 0; font-size: 16px; color: var(--accent-color); font-weight: 600; }
+    .game-info p { margin: 8px 0; font-size: 13px; color: #bbb; line-height: 1.4; flex-grow: 1; overflow: hidden; }
+    .game-tag { font-size: 11px; color: #666; font-weight: bold; text-transform: uppercase; border-top: 1px solid #222; padding-top: 10px; }
 
-    .menu-item,
-    .menu-item1 {
-      width: 125px;
-      height: 75px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 15px;
-      text-align: center;
-      font-size: 18px;
-      transition: transform 0.3s, background-color 0.3s;
-      text-decoration: none;
-      color: white;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    /* Açık tema buton renkleri */
-    body.light-mode .menu-item {
-      background-color: #16d7de;
-    }
-
-    body.light-mode .menu-item1 {
-      background-color: #cc1d1d;
-    }
-
-    /* Koyu tema buton renkleri */
-    body.dark-mode .menu-item {
-      background-color: #0d6e73;
-    }
-
-    body.dark-mode .menu-item1 {
-      background-color: #7a1212;
-    }
-
-    .menu-item:hover,
-    .menu-item1:hover {
-      transform: scale(1.1);
-      background-color: #36d646;
-    }
-
-    /* Kullanıcı adı, coin ve çıkış butonu alanı */
-    #user-info {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      color: white;
-      font-weight: bold;
-      background-color: rgba(0,0,0,0.4);
-      padding: 8px 12px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      z-index: 1000;
-      font-size: 16px;
-      user-select: none;
-    }
-
-    #user-info button {
-      background-color: #cc1d1d;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-      padding: 5px 10px;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
-
-    #user-info button:hover {
-      background-color: #e04b4b;
-    }
-
-    /* Coin sayacı stili */
-    #coin-counter {
-      background-color: #36d646;
-      padding: 5px 12px;
-      border-radius: 6px;
-      color: white;
-      font-weight: bold;
-      user-select: none;
-      min-width: 50px;
-      text-align: center;
+    @media (max-width: 768px) {
+      .sidebar { width: 70px; padding: 10px; }
+      .sidebar h2, .sidebar span, .sidebar p { display: none; }
+      .main-content { margin-left: 70px; width: calc(100% - 70px); }
     }
   </style>
+  
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026" crossorigin="anonymous"></script>
 </head>
 <body>
 
-  <div class="top-buttons">
-    <button onclick="toggleTheme()">🌓 Tema Değiştir</button>
-    <a href="/giris.html">Giriş / Kayıt Ol</a>
-  </div>
+  <nav class="sidebar">
+    <h2>GameSitesi</h2>
+    <a href="#"><i class="fas fa-home"></i> <span>Ana Sayfa</span></a>
+    
+    <div style="margin-top: 15px;">
+      <p style="font-size: 11px; color: #444; padding-left: 12px; font-weight: bold;">SOSYAL</p>
+      <a href="https://www.youtube.com/@eyprosakir" target="_blank"><i class="fab fa-youtube"></i> <span>YouTube</span></a>
+      <a href="https://scratch.mit.edu" target="_blank"><i class="fas fa-code"></i> <span>Scratch</span></a>
+      <a href="https://github.com/gamesitesi" target="_blank"><i class="fab fa-github"></i> <span>GitHub</span></a>
+    </div>
 
-  <div id="user-info" style="display:none;">
-    <span id="displayName"></span>
-    <span id="coin-counter">0 💰</span>
-    <button onclick="signOut()">Çıkış Yap</button>
-  </div>
+    <div class="sidebar-footer">
+      <a href="/giris.html" id="login-btn"><i class="fas fa-sign-in-alt"></i> <span>Giriş</span></a>
+      <div id="user-panel">
+        <span class="user-name" id="displayName">...</span>
+        <div class="coin-box"><span>Bakiye:</span><span id="coin-counter">0 💰</span></div>
+        <button onclick="signOut()" class="logout-btn">Çıkış</button>
+      </div>
+    </div>
+  </nav>
 
-  <h1>Bedava Oyun :)🎮</h1>
+  <main class="main-content">
+    
+    <div class="ad-container">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8243937357954026" data-ad-slot="8455765938" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
 
-  <div class="menu-container">
-    <a href="/jmpsak" class="menu-item">Jumping Şakir</a>
-    <a href="/pinpon" class="menu-item">Pinpon</a>
-    <a href="/2048" class="menu-item">2048</a>
-    <a href="/portalania" class="menu-item">Portalania</a>
-    <a href="/onlinecp3" class="menu-item">Stickman Parkour</a>
-    <a href="/stickmanclimb" class="menu-item">Stickman Climb</a>
-    <a href="/sayfa2/appelsec" class="menu-item">Appel</a>
-    <a href="/sayfa2/bsgame" class="menu-item">Coding Wars</a>
-    <a href="/sayfa2/fc25" class="menu-item">FC25 Pack Opening</a>
-    <a href="/sayfa2/paperminecraft" class="menu-item">Paper Minecraft</a>
-    <a href="/sayfa2/retro" class="menu-item">Retro Cars</a>
-    <a href="/games/home.html" class="menu-item1">Diğer Oyunlar (minecraft var)</a>
-  </div>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="gameSearch" placeholder="Oyunlarda ara..." onkeyup="filterGames()">
+    </div>
 
-  <!-- Firebase SDK'lar -->
+    <div class="games-grid" id="gamesGrid">
+      
+      <a href="/games/eaglercraft.1.8.8" class="game-card">
+        <img src="https://preview.redd.it/who-else-uses-eaglercraft-v0-4mik0if38tge1.jpeg?auto=webp&s=1b46e7736db6e1ba0ba51b81df91b3f2abd13f70">
+        <div class="game-info"><h3>Minecraft 1.8.8</h3><p>Efsanevi blok dünyasında hayatta kal ve kendi krallığını kur.</p><span class="game-tag">Survival</span></div>
+      </a>
+
+      <a href="/jmpsak" class="game-card">
+        <img src="https://i.ytimg.com/vi/Hwbrh3wZ2h4/maxresdefault.jpg">
+        <div class="game-info"><h3>Jumping Şakir</h3><p>Kral Şakir ile en yükseğe zıpla, engellerden kaç ve rekoru kır!</p><span class="game-tag">Arcade</span></div>
+      </a>
+
+      <a href="/portalania" class="game-card">
+        <img src="https://i.hizliresim.com/c3qagy1.png">
+        <div class="game-info"><h3>Portalania</h3><p>Boyutlar arası kapıları kullanarak karmaşık bulmacaları çözmeye hazır ol.</p><span class="game-tag">Bulmaca</span></div>
+      </a>
+
+      <a href="/onlinecp3" class="game-card">
+        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/c72f227e8752a72aaa1d0d5418706029/stickman-race.png">
+        <div class="game-info"><h3>Stickman Race</h3><p>Rakiplerini geçmek için doğru zamanda zıpla ve en hızlı çöp adam ol.</p><span class="game-tag">Yarış</span></div>
+      </a>
+
+      <a href="/stickmanclimb" class="game-card">
+        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/3c338d4afffa6a269b9642efef13f5ca/stickman-climb-2.png">
+        <div class="game-info"><h3>Stickman Climb</h3><p>Çekiçle tırmanmak hiç bu kadar zor olmamıştı! Sabrını test et.</p><span class="game-tag">Zorlayıcı</span></div>
+      </a>
+
+      <a href="/sayfa2/appelsec" class="game-card">
+        <img src="https://www.speedrun.com/static/game/ldewn2jd/cover.png?v=ca91491">
+        <div class="game-info"><h3>Appel</h3><p>Gezegenleri keşfet, engelleri aş ve bu epik platform macerasını bitir.</p><span class="game-tag">Platform</span></div>
+      </a>
+
+      <a href="/sayfa2/bsgame" class="game-card">
+        <img src="https://i.scdn.co/image/ab6761610000e5ebf7b952107c126c561c52171e">
+        <div class="game-info"><h3>Coding Wars</h3><p>Yazılım dünyasında savaş başlasın! Kodlarını konuştur ve kazan.</p><span class="game-tag">Strateji</span></div>
+      </a>
+
+      <a href="/sayfa2/fc25" class="game-card">
+        <img src="https://shikogamestore.com/wp-content/uploads/2025/07/516863326_1301231364696535_2827501892350202698_n.jpg">
+        <div class="game-info"><h3>FC25 Pack Opening</h3><p>Şansını dene ve hayalindeki futbol kadrosunu paket açarak oluştur.</p><span class="game-tag">Simülasyon</span></div>
+      </a>
+
+      <a href="/sayfa2/paperminecraft" class="game-card">
+        <img src="https://img.itch.zone/aW1nLzEyODU0NDA0LnBuZw==/original/asbVhs.png">
+        <div class="game-info"><h3>Paper Minecraft</h3><p>Minecraft'ın kağıt üzerindeki 2D dünyasına hoş geldin!</p><span class="game-tag">2D Creative</span></div>
+      </a>
+
+      <a href="/2048" class="game-card">
+        <img src="https://love2dev.com/img/2048-logo-600x310-600x311.png">
+        <div class="game-info"><h3>2048</h3><p>Sayıları birleştirerek 2048 karesine ulaşmaya çalışan bir zihin oyunu.</p><span class="game-tag">Zeka</span></div>
+      </a>
+
+      <a href="/sayfa2/retro" class="game-card">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3AGiykyDka501MbQl-e4AgCTKAMgow18nzA&s">
+        <div class="game-info"><h3>Retro Cars</h3><p>Eski tarz arabalarla nostaljik ve hızlı bir yarışa katıl.</p><span class="game-tag">Araba</span></div>
+      </a>
+
+      <a href="/pinpon" class="game-card">
+        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/c02dcbba0cc309d178806541248df443/ping-pong-go.png">
+        <div class="game-info"><h3>Pinpon</h3><p>Klasik tenis heyecanını dijital dünyada yaşa.</p><span class="game-tag">Spor</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/eaglercraft.1.8.8.html" class="game-card">
+        <img src="https://preview.redd.it/who-else-uses-eaglercraft-v0-4mik0if38tge1.jpeg?auto=webp&s=1b46e7736db6e1ba0ba51b81df91b3f2abd13f70">
+        <div class="game-info"><h3>3D MineCraft</h3><p>Gerçekten Minecraft! Browser üzerinde tam performans macera.</p><span class="game-tag">Macera</span></div>
+      </a>
+
+      <a href="/games/uno" class="game-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/UNO_Logo.svg/640px-UNO_Logo.svg.png">
+        <div class="game-info"><h3>UNO ONLINE</h3><p>Online rakiplere karşı kartlarını bitir ve masanın kazananı ol.</p><span class="game-tag">Kart</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/block_wall_destroyer" class="game-card">
+        <img src="https://imgs.crazygames.com/block-wall-destroyer_16x9/20250602093150/block-wall-destroyer_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop">
+        <div class="game-info"><h3>Block War Destroyer</h3><p>Önündeki tüm blok duvarlarını parçala ve yolu aç!</p><span class="game-tag">Aksiyon</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/find_the_pets" class="game-card">
+        <img src="https://i.ytimg.com/vi/9e-jiMb3gt4/maxresdefault.jpg">
+        <div class="game-info"><h3>Find The Pets</h3><p>Görsellerin arasına gizlenmiş sevimli dostlarımızı bul.</p><span class="game-tag">Gizli Obje</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/car_sky_survival" class="game-card">
+        <img src="https://imgs.crazygames.com/car-sky-survival_16x9/20250623083121/car-sky-survival_16x9-cover?metadata=none&quality=60&width=1200&height=630&fit=crop">
+        <div class="game-info"><h3>Car Sky Survival</h3><p>Gökyüzündeki dar yollarda arabanla hayatta kalmaya çalış.</p><span class="game-tag">Sürüş</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/crazycars" class="game-card">
+        <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/2bc8004fcbb4387908a636e2a9d9ab4a/crazy-cars.png">
+        <div class="game-info"><h3>Crazy Cars</h3><p>Pistin tozunu attıracak en çılgın arabaları kullan.</p><span class="game-tag">Hız</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/omnom.html" class="game-card">
+        <img src="https://imgs.crazygames.com/games/om-nom-run/cover_16x9-1707829613214.png?metadata=none&quality=60&width=1200&height=630&fit=crop">
+        <div class="game-info"><h3>Om Nom Run</h3><p>Om Nom ile durmadan koş ve toplayabildiğin kadar şeker topla.</p><span class="game-tag">Runner</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/goescape.html" class="game-card">
+        <img src="https://games.lol/wp-content/uploads/2023/04/go-escape-pc-full-version.jpg">
+        <div class="game-info"><h3>Go Escape</h3><p>Kaçış yolunu bulmak için topu ustalıkla fırlat.</p><span class="game-tag">Beceri</span></div>
+      </a>
+
+      <a href="https://gamesitesi.github.io/games/shoot_goal/index.html" class="game-card">
+        <img src="https://play-lh.googleusercontent.com/9KIzrqc0qcQQQbdyLrL7BbNlYJO7EYGKDJawH5BYkZT_KRb_9_lGNLz-A1foSm4blA=w526-h296-rw">
+        <div class="game-info"><h3>Shoot Goal!</h3><p>Kaleciyi geç ve topu tam doksana gönder!</p><span class="game-tag">Futbol</span></div>
+      </a>
+
+
+    </div>
+
+    <div class="ad-container">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8243937357954026" data-ad-slot="8455765938" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+  </main>
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase konfigürasyonunu kendi projenle değiştir
     const firebaseConfig = {
       apiKey: "AIzaSyAlMVSsdR38Mgsa-J07cFSb6ulXWJ3zDxA",
       authDomain: "gamesitesi.firebaseapp.com",
@@ -221,137 +280,39 @@
       messagingSenderId: "773041885856",
       appId: "1:773041885856:web:b262427b8f31af24bcafc5"
     };
-
-    // Firebase başlat
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Tema fonksiyonları
-    function getCookie(name) {
-      const value = "; " + document.cookie;
-      const parts = value.split("; " + name + "=");
-      if (parts.length === 2) return parts.pop().split(";").shift();
+    function filterGames() {
+      let input = document.getElementById('gameSearch').value.toLowerCase();
+      let cards = document.getElementsByClassName('game-card');
+      for (let card of cards) {
+        let title = card.querySelector('h3').innerText.toLowerCase();
+        card.style.display = title.includes(input) ? "" : "none";
+      }
     }
 
-    function toggleTheme() {
-      const current = document.body.classList.contains("dark-mode") ? "dark" : "light";
-      const next = current === "dark" ? "light" : "dark";
-      document.body.classList.remove(current + "-mode");
-      document.body.classList.add(next + "-mode");
-      document.cookie = "theme=" + next + "; path=/; max-age=31536000";
-    }
+    function signOut() { auth.signOut().then(() => location.reload()); }
 
-    // Adsense scripti dinamik ekleme fonksiyonu
-    function loadAdsenseScript() {
-      if (document.getElementById('adsense-script')) return; // Tekrar ekleme
-      const script = document.createElement('script');
-      script.id = 'adsense-script';
-      script.async = true;
-      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8243937357954026";
-      script.crossOrigin = "anonymous";
-      document.head.appendChild(script);
-    }
-
-    // Kullanıcının coin bilgisini gösteren ve her dakika coin ekleyen fonksiyon
-    function startCoinTimer(userDocRef, displayName, isPremium) {
-      const coinCounter = document.getElementById("coin-counter");
-
-      // İlk coin değerini göster
-      userDocRef.get().then(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          const coin = data.coin || 0;
-          coinCounter.textContent = coin + " 💰";
-        }
-      });
-
-      // Her dakika 1 coin ekle (admin sonsuz premium olduğu için eklenmez)
-      setInterval(() => {
-        userDocRef.get().then(doc => {
-          if (!doc.exists) return;
-
-          const data = doc.data();
-          let coin = data.coin || 0;
-          const userName = displayName.toLowerCase();
-
-          if (userName === "admin") {
-            // admin sonsuz premium, coin eklenmez
-            coinCounter.textContent = "∞ 💰";
-            return;
-          }
-
-          // Premium veya normal kullanıcılar 1 coin ekler
-          coin += 1;
-          userDocRef.update({ coin: coin });
-          coinCounter.textContent = coin + " 💰";
-        });
-      }, 60000); // 60 saniyede bir
-    }
-
-    // Giriş çıkış fonksiyonu
-    function signOut() {
-      auth.signOut().then(() => {
-        location.reload();
-      });
-    }
-
-    // Sayfa yüklendiğinde tema ayarla
-    window.addEventListener("load", () => {
-      const theme = getCookie("theme") || "light";
-      document.body.classList.add(theme + "-mode");
-    });
-
-    // Kullanıcı durumu değişince
     auth.onAuthStateChanged(user => {
-      const userInfo = document.getElementById("user-info");
-      const displayNameSpan = document.getElementById("displayName");
-      const coinCounter = document.getElementById("coin-counter");
-
+      const userPanel = document.getElementById("user-panel");
+      const loginBtn = document.getElementById("login-btn");
       if (user) {
-        const displayName = user.displayName || user.email.split("@")[0];
-        displayNameSpan.textContent = displayName;
-
-        userInfo.style.display = "flex";
-
+        loginBtn.style.display = "none";
+        userPanel.style.display = "flex";
+        const name = user.displayName || user.email.split("@")[0];
+        document.getElementById("displayName").textContent = name;
         const userDocRef = db.collection("users").doc(user.uid);
-
-        // Kullanıcı verisini firestore'dan çek
         userDocRef.get().then(doc => {
-          let coin = 0;
-          if (doc.exists) {
-            const data = doc.data();
-            coin = data.coin || 0;
-          } else {
-            // Doküman yoksa oluştur
-            userDocRef.set({ coin: 0 });
-          }
-
-          coinCounter.textContent = (displayName.toLowerCase() === "admin" ? "∞" : coin) + " 💰";
-
-          // Premium kullanıcılar listesi (daha çok kullanıcı eklenebilir)
-          const premiumUsers = ["admin", "premiumuser1", "premiumuser2"];
-
-          const isPremium = premiumUsers.includes(displayName.toLowerCase());
-
-          // Reklam sadece premium olmayanlara gösterilsin
-          if (!isPremium) {
-            loadAdsenseScript();
-          }
-
-          // Coin ekleme timer'ı başlat
-          startCoinTimer(userDocRef, displayName, isPremium);
+          let coin = doc.exists ? doc.data().coin : 0;
+          document.getElementById("coin-counter").textContent = (name.toLowerCase() === "admin" ? "∞" : coin) + " 💰";
         });
-
       } else {
-        // Giriş yok reklam göster
-        loadAdsenseScript();
-
-        userInfo.style.display = "none";
+        loginBtn.style.display = "flex";
+        userPanel.style.display = "none";
       }
     });
   </script>
-
 </body>
 </html>
-
