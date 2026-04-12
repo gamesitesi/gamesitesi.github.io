@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🥙 DÖNER İMPARATORLUĞU</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg: #1a0a00;
+  --panel: #2d1200;
+  --panel2: #3d1800;
+  --accent: #ff6b00;
+  --accent2: #ffaa00;
+  --green: #00e676;
+  --red: #ff1744;
+  --blue: #00b0ff;
+  --purple: #aa00ff;
+  --text: #fff8f0;
+  --muted: #a08060;
+  --gold: #ffd700;
+  --rival: #ff0040;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+}
+
+/* ===== INTRO SCREEN ===== */
+#intro {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, #1a0a00 0%, #3d1800 50%, #1a0a00 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999;
+  animation: introBg 3s infinite alternate;
+}
+@keyframes introBg {
+  from { background: linear-gradient(135deg, #1a0a00, #3d1800, #1a0a00); }
+  to { background: linear-gradient(135deg, #2d0500, #5a2000, #2d0500); }
+}
+#intro h1 {
+  font-family: 'Bangers', cursive;
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  color: var(--accent);
+  text-shadow: 0 0 30px #ff6b0088, 4px 4px 0 #5a2000;
+  letter-spacing: 4px;
+  animation: titlePulse 1.5s infinite alternate;
+}
+@keyframes titlePulse {
+  from { transform: scale(1); text-shadow: 0 0 30px #ff6b0088, 4px 4px 0 #5a2000; }
+  to { transform: scale(1.04); text-shadow: 0 0 60px #ff6b00cc, 4px 4px 0 #5a2000; }
+}
+#intro .emoji-spin {
+  font-size: 6rem; animation: spin 4s linear infinite;
+  display: block; margin-bottom: 1rem;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+#intro p { font-size: 1.2rem; color: var(--accent2); margin: 1rem 0 2rem; text-align: center; max-width: 500px; }
+.btn-start {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #1a0a00; border: none; padding: 1rem 3rem;
+  font-family: 'Bangers', cursive; font-size: 2rem; letter-spacing: 2px;
+  border-radius: 50px; cursor: pointer;
+  box-shadow: 0 0 30px #ff6b0088;
+  transition: all 0.2s; animation: btnPop 1s infinite alternate;
+}
+@keyframes btnPop {
+  from { transform: scale(1); box-shadow: 0 0 20px #ff6b0088; }
+  to { transform: scale(1.05); box-shadow: 0 0 40px #ff6b00cc; }
+}
+.btn-start:hover { transform: scale(1.1); }
+
+/* ===== MAIN LAYOUT ===== */
+#game { display: none; height: 100vh; width: 100vw; flex-direction: column; }
+#game.active { display: flex; }
+
+/* TOP BAR */
+#topbar {
+  background: linear-gradient(90deg, #2d1200, #1a0800, #2d1200);
+  border-bottom: 2px solid var(--accent);
+  padding: 0.4rem 1rem;
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap; min-height: 56px;
+  box-shadow: 0 2px 20px #ff6b0044;
+}
+.shop-name {
+  font-family: 'Bangers', cursive; font-size: 1.6rem;
+  color: var(--accent2); text-shadow: 2px 2px 0 #5a2000;
+  letter-spacing: 2px; white-space: nowrap;
+}
+.stat-pill {
+  background: var(--panel2);
+  border: 1px solid var(--accent);
+  border-radius: 20px; padding: 0.2rem 0.8rem;
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.85rem; font-weight: 700;
+  white-space: nowrap;
+}
+.stat-pill .ico { font-size: 1rem; }
+.stat-pill .val { color: var(--accent2); }
+#day-pill .val { color: var(--blue); }
+#rep-pill .val { color: var(--gold); }
+#lvl-pill .val { color: var(--purple); }
+
+#topbar .spacer { flex: 1; }
+.btn-icon {
+  background: var(--panel2); border: 1px solid var(--accent);
+  color: var(--text); border-radius: 10px; padding: 0.3rem 0.7rem;
+  cursor: pointer; font-size: 0.85rem; font-weight: 700;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-icon:hover { background: var(--accent); color: #1a0a00; }
+
+/* ===== MAIN AREA ===== */
+#main {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* LEFT PANEL - RESTAURANT FLOOR */
+#floor-area {
+  flex: 1; position: relative; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 30%, #2d1500 0%, #1a0a00 70%);
+}
+
+/* FLOOR DECORATION */
+.floor-deco {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,107,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,107,0,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* COUNTER / KITCHEN */
+#counter {
+  position: absolute; top: 0; left: 0; right: 0; height: 90px;
+  background: linear-gradient(180deg, #3d1800 0%, #2d1200 100%);
+  border-bottom: 3px solid var(--accent);
+  display: flex; align-items: center; padding: 0 1rem; gap: 1rem;
+  box-shadow: 0 4px 20px #ff6b0033;
+}
+.kitchen-label {
+  font-family: 'Bangers', cursive; font-size: 1.3rem;
+  color: var(--accent2); letter-spacing: 2px;
+  writing-mode: horizontal-tb;
+  white-space: nowrap;
+}
+.spit-wrap {
+  position: relative; width: 60px; height: 70px;
+  display: flex; align-items: center; justify-content: center;
+}
+.spit-meat {
+  font-size: 3rem; animation: spitRotate 2s linear infinite;
+  display: block; transform-origin: center;
+}
+@keyframes spitRotate {
+  0% { transform: scaleX(1); }
+  25% { transform: scaleX(0.4); }
+  50% { transform: scaleX(-1); }
+  75% { transform: scaleX(-0.4); }
+  100% { transform: scaleX(1); }
+}
+.spit-bar {
+  position: absolute; width: 4px; height: 70px;
+  background: linear-gradient(180deg, #aaa, #666); border-radius: 2px;
+  left: 50%; transform: translateX(-50%);
+  z-index: -1;
+}
+
+/* PREP AREA */
+#prep-area {
+  flex: 1; display: flex; align-items: center; gap: 0.5rem;
+  overflow-x: auto; padding: 0 0.5rem;
+}
+.prep-slot {
+  min-width: 55px; height: 55px;
+  background: var(--panel2);
+  border: 2px dashed #5a2000;
+  border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 1.5rem; cursor: pointer; transition: all 0.15s;
+  position: relative;
+}
+.prep-slot:hover { border-color: var(--accent); transform: scale(1.05); }
+.prep-slot .slot-label { font-size: 0.45rem; color: var(--muted); margin-top: 2px; }
+.prep-slot.locked { opacity: 0.4; cursor: not-allowed; }
+.prep-slot.locked::after {
+  content: '🔒'; position: absolute; top: -5px; right: -5px; font-size: 0.7rem;
+}
+.prep-slot.selected { border-color: var(--green); background: #003010; }
+
+/* CURRENT ORDER DISPLAY */
+#current-order-display {
+  min-width: 200px; background: var(--panel);
+  border: 2px solid var(--accent2); border-radius: 10px;
+  padding: 0.4rem 0.6rem; max-height: 80px; overflow-y: auto;
+}
+#current-order-display h4 { font-size: 0.7rem; color: var(--accent2); margin-bottom: 0.2rem; }
+#doner-preview {
+  display: flex; flex-wrap: wrap; gap: 2px; min-height: 20px;
+}
+.ingredient-tag {
+  background: var(--panel2); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 1px 5px; font-size: 0.65rem;
+  display: flex; align-items: center; gap: 2px;
+}
+.ingredient-tag button {
+  background: none; border: none; color: var(--red);
+  cursor: pointer; font-size: 0.6rem; padding: 0;
+}
+
+/* SERVE BUTTON */
+.btn-serve {
+  background: linear-gradient(135deg, var(--green), #00a050);
+  color: #001a00; border: none; padding: 0.5rem 1rem;
+  font-family: 'Bangers', cursive; font-size: 1.2rem;
+  border-radius: 10px; cursor: pointer; white-space: nowrap;
+  transition: all 0.15s; box-shadow: 0 0 15px #00e67644;
+}
+.btn-serve:hover { transform: scale(1.05); box-shadow: 0 0 25px #00e676aa; }
+.btn-serve:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* FLOOR / TABLES */
+#tables-container {
+  position: absolute; top: 100px; left: 0; right: 0; bottom: 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+
+/* TABLE */
+.table-card {
+  background: var(--panel);
+  border: 2px solid #5a2000;
+  border-radius: 14px; padding: 0.7rem;
+  cursor: pointer; transition: all 0.2s;
+  position: relative; min-height: 130px;
+  display: flex; flex-direction: column; gap: 0.3rem;
+}
+.table-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.table-card.selected { border-color: var(--green); box-shadow: 0 0 15px #00e67644; }
+.table-card.rival {
+  border-color: var(--rival);
+  background: linear-gradient(135deg, #1a0010, #2d0015);
+}
+.table-card.rival:hover { border-color: #ff6090; }
+.table-card.empty { opacity: 0.6; }
+.table-card.locked {
+  opacity: 0.4; cursor: not-allowed;
+  border-style: dashed;
+}
+
+.table-num {
+  font-family: 'Bangers', cursive; font-size: 1rem; color: var(--muted);
+  position: absolute; top: 6px; right: 8px;
+}
+.table-status {
+  font-size: 0.7rem; font-weight: 700; padding: 2px 8px;
+  border-radius: 20px; text-align: center; width: fit-content;
+}
+.status-empty { background: #333; color: #888; }
+.status-waiting { background: #442200; color: var(--accent2); animation: pulse 1s infinite alternate; }
+.status-eating { background: #003320; color: var(--green); }
+.status-angry { background: #440000; color: var(--red); animation: shake 0.3s infinite; }
+.status-rival { background: #440020; color: var(--rival); }
+.status-locked { background: #222; color: #666; }
+
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.6; } }
+@keyframes shake {
+  0% { transform: translateX(-1px); } 50% { transform: translateX(1px); } 100% { transform: translateX(-1px); }
+}
+
+.table-customers {
+  display: flex; flex-wrap: wrap; gap: 2px; min-height: 24px;
+}
+.customer-avatar { font-size: 1.3rem; }
+
+.table-order {
+  font-size: 0.65rem; color: var(--accent2);
+  background: var(--panel2); border-radius: 6px; padding: 2px 5px;
+  min-height: 16px;
+}
+
+.table-timer {
+  height: 4px; background: #333; border-radius: 2px; overflow: hidden;
+}
+.table-timer-fill {
+  height: 100%; background: var(--green); border-radius: 2px;
+  transition: width 0.5s, background 0.5s;
+}
+
+.table-satisfaction {
+  display: flex; gap: 1px;
+}
+.star { font-size: 0.7rem; color: #444; }
+.star.lit { color: var(--gold); }
+
+/* RIVAL ATTACK */
+.rival-hp {
+  position: absolute; bottom: 6px; right: 6px;
+  font-size: 0.65rem; color: var(--rival);
+  font-weight: 700;
+}
+.rival-badge {
+  position: absolute; top: 6px; left: 6px;
+  background: var(--rival); color: white;
+  font-size: 0.55rem; font-weight: 700; padding: 1px 5px;
+  border-radius: 10px;
+}
+
+/* EXPAND BUTTON */
+.table-expand-btn {
+  position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #1a0a00; border: none;
+  border-radius: 20px; padding: 2px 12px; font-size: 0.65rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.table-expand-btn:hover { transform: translateX(-50%) scale(1.1); }
+
+/* ===== RIGHT PANEL ===== */
+#right-panel {
+  width: 260px; background: var(--panel);
+  border-left: 2px solid var(--accent);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* TABS */
+.tab-bar {
+  display: flex; border-bottom: 2px solid var(--accent);
+}
+.tab-btn {
+  flex: 1; padding: 0.5rem 0.3rem;
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 0.7rem; font-weight: 700;
+  transition: all 0.15s; border-right: 1px solid #5a2000;
+  font-family: 'Nunito', sans-serif;
+}
+.tab-btn:last-child { border-right: none; }
+.tab-btn.active { color: var(--accent2); background: var(--panel2); }
+.tab-btn:hover { color: var(--text); }
+
+.tab-content { flex: 1; overflow-y: auto; padding: 0.7rem; display: none; }
+.tab-content.active { display: block; }
+
+/* UPGRADES */
+.upgrade-card {
+  background: var(--panel2); border: 1px solid #5a2000;
+  border-radius: 10px; padding: 0.6rem; margin-bottom: 0.5rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.upgrade-card:hover { border-color: var(--accent); }
+.upgrade-card.maxed { border-color: var(--gold); opacity: 0.8; cursor: default; }
+.upgrade-card.cant-afford { opacity: 0.5; }
+.upgrade-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.upgrade-name { font-weight: 700; font-size: 0.8rem; }
+.upgrade-cost { font-size: 0.75rem; color: var(--accent2); font-weight: 700; }
+.upgrade-desc { font-size: 0.65rem; color: var(--muted); }
+.upgrade-progress { margin-top: 0.3rem; }
+.upgrade-level-dots { display: flex; gap: 3px; margin-top: 3px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #333; }
+.dot.filled { background: var(--accent2); }
+
+/* STAFF */
+.staff-card {
+  background: var(--panel2); border: 1px solid #5a2000;
+  border-radius: 10px; padding: 0.6rem; margin-bottom: 0.5rem;
+  display: flex; gap: 0.5rem; align-items: center;
+}
+.staff-avatar { font-size: 1.8rem; }
+.staff-info { flex: 1; }
+.staff-name { font-weight: 700; font-size: 0.8rem; }
+.staff-role { font-size: 0.65rem; color: var(--muted); }
+.staff-bar-wrap { height: 4px; background: #333; border-radius: 2px; margin-top: 4px; }
+.staff-bar-fill { height: 100%; border-radius: 2px; background: var(--blue); transition: width 0.3s; }
+.btn-hire {
+  background: var(--accent); color: #1a0a00; border: none;
+  border-radius: 8px; padding: 0.3rem 0.6rem;
+  font-size: 0.7rem; font-weight: 700; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-hire:hover { transform: scale(1.05); }
+.btn-hire:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* LOG */
+#log-list { list-style: none; }
+#log-list li {
+  font-size: 0.72rem; padding: 0.3rem 0;
+  border-bottom: 1px solid #3d1800;
+  color: var(--muted); animation: fadeIn 0.3s;
+}
+#log-list li.good { color: var(--green); }
+#log-list li.bad { color: var(--red); }
+#log-list li.info { color: var(--blue); }
+#log-list li.gold { color: var(--gold); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+
+/* RECIPE / ORDER GUIDE */
+.order-guide-card {
+  background: var(--panel2); border: 1px solid #5a2000;
+  border-radius: 10px; padding: 0.6rem; margin-bottom: 0.5rem;
+}
+.order-guide-name { font-weight: 700; font-size: 0.8rem; color: var(--accent2); margin-bottom: 0.3rem; }
+.order-guide-ingredients { display: flex; flex-wrap: wrap; gap: 3px; }
+.order-guide-tag { font-size: 0.6rem; background: var(--panel); border: 1px solid #5a2000; border-radius: 6px; padding: 1px 5px; }
+
+/* ===== NOTIFICATIONS ===== */
+#notifications {
+  position: fixed; top: 70px; right: 10px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 5px; pointer-events: none;
+  max-width: 240px;
+}
+.notif {
+  background: var(--panel2); border: 2px solid var(--accent);
+  border-radius: 10px; padding: 0.5rem 0.8rem;
+  font-size: 0.8rem; font-weight: 700;
+  animation: notifIn 0.3s ease-out;
+  pointer-events: none;
+}
+.notif.good { border-color: var(--green); color: var(--green); }
+.notif.bad { border-color: var(--red); color: var(--red); }
+.notif.gold { border-color: var(--gold); color: var(--gold); }
+@keyframes notifIn {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ===== MODAL ===== */
+#modal-overlay {
+  position: fixed; inset: 0; background: #000a;
+  z-index: 5000; display: none; align-items: center; justify-content: center;
+}
+#modal-overlay.active { display: flex; }
+#modal {
+  background: var(--panel); border: 2px solid var(--accent);
+  border-radius: 16px; padding: 1.5rem; max-width: 420px; width: 90%;
+  max-height: 80vh; overflow-y: auto;
+  animation: modalIn 0.3s ease-out;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+#modal h2 { font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent2); margin-bottom: 1rem; }
+.modal-body { font-size: 0.9rem; color: var(--text); margin-bottom: 1rem; }
+.modal-btns { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.btn-modal {
+  padding: 0.5rem 1.2rem; border: none; border-radius: 8px;
+  font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer;
+  font-size: 0.85rem; transition: all 0.15s;
+}
+.btn-confirm { background: var(--accent); color: #1a0a00; }
+.btn-cancel { background: var(--panel2); color: var(--text); border: 1px solid #5a2000; }
+.btn-modal:hover { transform: scale(1.05); }
+
+/* ===== RIVAL BATTLE ===== */
+#battle-overlay {
+  position: fixed; inset: 0; background: #000c;
+  z-index: 4000; display: none;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem;
+}
+#battle-overlay.active { display: flex; }
+.battle-box {
+  background: linear-gradient(135deg, #2d0010, #1a0a00);
+  border: 3px solid var(--rival); border-radius: 16px; padding: 1.5rem;
+  width: 90%; max-width: 500px; text-align: center;
+}
+.battle-box h2 { font-family: 'Bangers', cursive; font-size: 2.5rem; color: var(--rival); margin-bottom: 1rem; }
+.battle-vs { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1rem 0; }
+.battle-fighter { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.battle-fighter .avatar { font-size: 3rem; }
+.battle-fighter .name { font-weight: 700; font-size: 0.9rem; }
+.battle-hp-bar { width: 120px; height: 12px; background: #333; border-radius: 6px; overflow: hidden; }
+.battle-hp-fill { height: 100%; border-radius: 6px; transition: width 0.5s; }
+#player-hp-fill { background: var(--green); }
+#rival-hp-fill { background: var(--red); }
+.vs-text { font-family: 'Bangers', cursive; font-size: 3rem; color: var(--rival); }
+.battle-log { font-size: 0.85rem; color: var(--text); min-height: 60px; margin: 0.5rem 0; }
+.battle-actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+.btn-battle {
+  background: linear-gradient(135deg, var(--rival), #990030);
+  color: white; border: none; border-radius: 10px; padding: 0.6rem 1rem;
+  font-weight: 700; cursor: pointer; transition: all 0.15s; font-size: 0.85rem;
+  font-family: 'Nunito', sans-serif;
+}
+.btn-battle:hover { transform: scale(1.05); }
+.btn-battle.special { background: linear-gradient(135deg, var(--gold), #cc8800); color: #1a0a00; }
+.btn-battle:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* COMBO */
+#combo-display {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 3000; pointer-events: none; display: none;
+  font-family: 'Bangers', cursive; font-size: 4rem;
+  color: var(--gold); text-shadow: 0 0 30px var(--gold);
+  animation: comboPop 0.8s ease-out forwards;
+}
+@keyframes comboPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+  60% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--panel); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+/* FLOATING COIN */
+.floating-coin {
+  position: fixed; font-size: 1.2rem; pointer-events: none; z-index: 2000;
+  animation: floatUp 1s ease-out forwards;
+  font-weight: 700; color: var(--gold); text-shadow: 0 0 10px var(--gold);
+}
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-80px); }
+}
+
+/* LEVEL UP */
+#levelup-screen {
+  position: fixed; inset: 0; background: #000a; z-index: 6000;
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem;
+}
+#levelup-screen.active { display: flex; }
+.levelup-box {
+  background: linear-gradient(135deg, #2d1200, #1a0800);
+  border: 3px solid var(--gold); border-radius: 20px; padding: 2rem;
+  text-align: center; max-width: 400px; width: 90%;
+  animation: levelupIn 0.5s ease-out;
+}
+@keyframes levelupIn {
+  from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.levelup-box h2 { font-family: 'Bangers', cursive; font-size: 3rem; color: var(--gold); }
+.levelup-box p { color: var(--text); margin: 0.5rem 0; }
+.reward-list { list-style: none; margin: 1rem 0; }
+.reward-list li { padding: 0.3rem 0; color: var(--accent2); font-weight: 700; }
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  #right-panel { width: 200px; }
+  #tables-container { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+@media (max-width: 500px) {
+  #right-panel { display: none; }
+  #tables-container { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+
+/* NIGHT MODE overlay for late hours */
+#night-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, transparent 30%, #00008833 100%);
+  opacity: 0; transition: opacity 2s;
+}
+
+/* Confetti particle */
+.confetti {
+  position: fixed; width: 10px; height: 10px; z-index: 7000;
+  pointer-events: none; animation: confettiFall 1.5s ease-in forwards;
+  border-radius: 2px;
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(200px) rotate(720deg); }
+}
+
+/* SHOP CLOSED */
+#closed-overlay {
+  position: fixed; inset: 0; background: #000c; z-index: 3500;
+  display: none; align-items: center; justify-content: center; flex-direction: column; gap: 1rem;
+  text-align: center;
+}
+#closed-overlay.active { display: flex; }
+#closed-overlay h2 { font-family: 'Bangers', cursive; font-size: 3rem; color: var(--accent2); }
+#closed-overlay p { color: var(--muted); max-width: 300px; }
+.btn-nextday {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #1a0a00; border: none; padding: 0.8rem 2rem;
+  font-family: 'Bangers', cursive; font-size: 1.5rem; border-radius: 10px;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-nextday:hover { transform: scale(1.05); }
+
+/* INCOME REPORT */
+.income-report { text-align: left; }
+.income-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #3d1800; font-size: 0.85rem; }
+.income-row.total { font-weight: 700; color: var(--accent2); font-size: 1rem; border-bottom: none; margin-top: 0.5rem; }
+
+/* TOOLTIP */
+.tooltip-wrap { position: relative; }
+.tooltip-wrap:hover .tooltip-box { display: block; }
+.tooltip-box {
+  display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: #000e; border: 1px solid var(--accent); border-radius: 8px;
+  padding: 0.4rem 0.7rem; font-size: 0.7rem; white-space: nowrap; z-index: 100;
+  pointer-events: none;
+}
+
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <span class="emoji-spin">🥙</span>
+  <h1>DÖNER İMPARATORLUĞU</h1>
+  <p>Kendi dönercini kur, müşterileri doyur, rakipleri ez geç ve efsane bir döner imparatorluğu inşa et!</p>
+  <button class="btn-start" onclick="startGame()">OYUNA BAŞLA! 🥙</button>
+</div>
+
+<!-- MAIN GAME -->
+<div id="game">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="shop-name">🥙 <span id="shop-name-text">Mehmet'in Dönercisi</span></div>
+    <div class="stat-pill" id="money-pill">
+      <span class="ico">💰</span><span class="val" id="money-val">500₺</span>
+    </div>
+    <div class="stat-pill" id="day-pill">
+      <span class="ico">📅</span><span class="val" id="day-val">1. Gün</span>
+    </div>
+    <div class="stat-pill" id="rep-pill">
+      <span class="ico">⭐</span><span class="val" id="rep-val">0</span>
+    </div>
+    <div class="stat-pill" id="lvl-pill">
+      <span class="ico">🏆</span><span class="val" id="lvl-val">Lv.1 Acemi</span>
+    </div>
+    <div class="stat-pill" id="time-pill">
+      <span class="ico">🕐</span><span class="val" id="time-val">08:00</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn-icon" onclick="openShopModal()">🏪 Dükkan</button>
+    <button class="btn-icon" onclick="closeDayManually()">🌙 Günü Bitir</button>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div id="main">
+
+    <!-- FLOOR AREA -->
+    <div id="floor-area">
+      <div class="floor-deco"></div>
+      <div id="night-overlay"></div>
+
+      <!-- COUNTER / KITCHEN -->
+      <div id="counter">
+        <div class="kitchen-label">🥙 MUTFAK</div>
+
+        <div class="spit-wrap tooltip-wrap">
+          <div class="spit-bar"></div>
+          <div class="spit-meat" id="spit-meat">🥩</div>
+          <div class="tooltip-box">Döner şişi - Et seviyesi: <span id="meat-level-tip">100%</span></div>
+        </div>
+
+        <div id="prep-area" id="prep-area-inner">
+          <!-- Malzemeler buraya gelecek -->
+        </div>
+
+        <div id="current-order-display">
+          <h4>📋 Yapılan Döner:</h4>
+          <div id="doner-preview"></div>
+        </div>
+
+        <button class="btn-serve" id="serve-btn" onclick="serveDoner()" disabled>
+          ✅ SER VİS ET!
+        </button>
+      </div>
+
+      <!-- TABLES -->
+      <div id="tables-container"></div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('log')">📋 Log</button>
+        <button class="tab-btn" onclick="switchTab('upgrades')">⬆️ Geliştir</button>
+        <button class="tab-btn" onclick="switchTab('staff')">👥 Çalışan</button>
+        <button class="tab-btn" onclick="switchTab('menu')">📖 Menü</button>
+      </div>
+      <div class="tab-content active" id="tab-log">
+        <ul id="log-list"></ul>
+      </div>
+      <div class="tab-content" id="tab-upgrades">
+        <div id="upgrades-list"></div>
+      </div>
+      <div class="tab-content" id="tab-staff">
+        <div id="staff-list"></div>
+      </div>
+      <div class="tab-content" id="tab-menu">
+        <div id="menu-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notifications"></div>
+
+<!-- COMBO DISPLAY -->
+<div id="combo-display"></div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="closeModal()">
+  <div id="modal" onclick="e => e.stopPropagation()">
+    <h2 id="modal-title">Başlık</h2>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-btns" id="modal-btns"></div>
+  </div>
+</div>
+
+<!-- BATTLE OVERLAY -->
+<div id="battle-overlay">
+  <div class="battle-box">
+    <h2>⚔️ RAKİP SALDIRISI!</h2>
+    <div class="battle-vs">
+      <div class="battle-fighter">
+        <div class="avatar">🧑‍🍳</div>
+        <div class="name" id="battle-player-name">Senin Dükkanın</div>
+        <div class="battle-hp-bar"><div class="battle-hp-fill" id="player-hp-fill" style="width:100%"></div></div>
+        <div style="font-size:0.75rem;color:var(--green)" id="player-hp-text">100 HP</div>
+      </div>
+      <div class="vs-text">VS</div>
+      <div class="battle-fighter">
+        <div class="avatar" id="rival-avatar">😈</div>
+        <div class="name" id="rival-name">Rakip</div>
+        <div class="battle-hp-bar"><div class="battle-hp-fill" id="rival-hp-fill" style="width:100%"></div></div>
+        <div style="font-size:0.75rem;color:var(--red)" id="rival-hp-text">100 HP</div>
+      </div>
+    </div>
+    <div class="battle-log" id="battle-log-text">Rakip dükkan seni ele geçirmeye çalışıyor!</div>
+    <div class="battle-actions">
+      <button class="btn-battle" id="battle-fast" onclick="battleAction('fast')">⚡ Hızlı Servis</button>
+      <button class="btn-battle" id="battle-quality" onclick="battleAction('quality')">🥙 Kaliteli Döner</button>
+      <button class="btn-battle special" id="battle-special" onclick="battleAction('special')">✨ Özel Tarif</button>
+      <button class="btn-battle" id="battle-defend" onclick="battleAction('defend')">🛡️ Savun</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div id="levelup-screen">
+  <div class="levelup-box">
+    <h2>🏆 SEVİYE ATLADI!</h2>
+    <p id="levelup-text">Tebrikler! Yeni seviyeye ulaştın!</p>
+    <ul class="reward-list" id="levelup-rewards"></ul>
+    <button class="btn-nextday" onclick="closeLevelup()">Devam Et!</button>
+  </div>
+</div>
+
+<!-- DAY CLOSED -->
+<div id="closed-overlay">
+  <div style="font-size:4rem">🌙</div>
+  <h2>Dükkan Kapandı!</h2>
+  <div class="income-report" id="income-report"></div>
+  <button class="btn-nextday" onclick="startNewDay()">☀️ Yeni Güne Başla!</button>
+</div>
+
+<script>
+// ==========================================
+//           DÖNER İMPARATORLUĞU
+//              Ana Oyun Motoru
+// ==========================================
+
+// ===== GAME STATE =====
+const G = {
+  money: 500,
+  day: 1,
+  reputation: 0,
+  xp: 0,
+  level: 1,
+  combo: 0,
+  comboTimer: null,
+  totalServed: 0,
+  totalEarned: 0,
+  dayEarned: 0,
+  dayServed: 0,
+  meatLevel: 100,
+  hour: 8, // 8 AM opening
+  minute: 0,
+  gameSpeed: 1,
+  dayLength: 720, // 12 hours * 60 minutes game-time per real second ratio
+  isOpen: true,
+  selectedTable: null,
+  selectedIngredients: [],
+  pendingModal: null,
+  battleActive: false,
+  battleData: null,
+  staffWorking: false,
+  autoServeTimer: null,
+};
+
+// ===== INGREDIENTS =====
+const INGREDIENTS = [
+  { id: 'et', name: 'Et', emoji: '🥩', cost: 0, unlockLv: 1, category: 'protein', flavor: 3 },
+  { id: 'tavuk', name: 'Tavuk', emoji: '🍗', cost: 0, unlockLv: 1, category: 'protein', flavor: 3 },
+  { id: 'mayonez', name: 'Mayonez', emoji: '🤍', cost: 0, unlockLv: 1, category: 'sauce', flavor: 2 },
+  { id: 'ketchup', name: 'Ketçap', emoji: '🍅', cost: 0, unlockLv: 1, category: 'sauce', flavor: 2 },
+  { id: 'doner_sos', name: 'Döner Sos', emoji: '🟠', cost: 0, unlockLv: 1, category: 'sauce', flavor: 3 },
+  { id: 'tursu', name: 'Turşu', emoji: '🥒', cost: 0, unlockLv: 1, category: 'veggie', flavor: 1 },
+  { id: 'sogme', name: 'Soğan', emoji: '🧅', cost: 0, unlockLv: 1, category: 'veggie', flavor: 1 },
+  { id: 'domates', name: 'Domates', emoji: '🍅', cost: 0, unlockLv: 1, category: 'veggie', flavor: 1 },
+  { id: 'patates', name: 'Patates', emoji: '🥔', cost: 0, unlockLv: 2, category: 'extra', flavor: 2 },
+  { id: 'biber', name: 'Biber', emoji: '🌶️', cost: 0, unlockLv: 2, category: 'veggie', flavor: 2 },
+  { id: 'sarimsak', name: 'Sarımsak', emoji: '🧄', cost: 0, unlockLv: 2, category: 'veggie', flavor: 2 },
+  { id: 'peynir', name: 'Peynir', emoji: '🧀', cost: 0, unlockLv: 3, category: 'extra', flavor: 3 },
+  { id: 'yumurta', name: 'Yumurta', emoji: '🥚', cost: 0, unlockLv: 3, category: 'extra', flavor: 2 },
+  { id: 'sogan_kavurma', name: 'Kavur. Soğan', emoji: '🟤', cost: 0, unlockLv: 4, category: 'extra', flavor: 3 },
+  { id: 'tzatziki', name: 'Tzatziki', emoji: '🥗', cost: 0, unlockLv: 4, category: 'sauce', flavor: 3 },
+  { id: 'acisir', name: 'Acı Sos', emoji: '🔴', cost: 0, unlockLv: 5, category: 'sauce', flavor: 2 },
+  { id: 'piyaz', name: 'Piyaz', emoji: '🥬', cost: 0, unlockLv: 5, category: 'veggie', flavor: 1 },
+  { id: 'mantar', name: 'Mantar', emoji: '🍄', cost: 0, unlockLv: 6, category: 'extra', flavor: 2 },
+  { id: 'avokado', name: 'Avokado', emoji: '🥑', cost: 0, unlockLv: 7, category: 'extra', flavor: 3 },
+  { id: 'truffle', name: 'Truffle Sos', emoji: '⚫', cost: 0, unlockLv: 8, category: 'sauce', flavor: 4 },
+];
+
+// ===== ORDER TYPES (menu items) =====
+const ORDER_TYPES = [
+  { id: 'normal', name: 'Normal Döner', required: ['et', 'tursu', 'sogme'], optional: ['ketchup', 'mayonez'], price: 45, unlockLv: 1 },
+  { id: 'tavuk_doner', name: 'Tavuk Döner', required: ['tavuk', 'tursu', 'sogme'], optional: ['mayonez', 'doner_sos'], price: 40, unlockLv: 1 },
+  { id: 'acili', name: 'Acılı Döner', required: ['et', 'biber', 'acisir'], optional: ['sogme', 'ketchup'], price: 50, unlockLv: 2 },
+  { id: 'karisik', name: 'Karışık Döner', required: ['et', 'tavuk', 'tursu'], optional: ['doner_sos', 'mayonez'], price: 60, unlockLv: 2 },
+  { id: 'pide', name: 'Pide Döner', required: ['et', 'domates', 'sogme'], optional: ['ketchup', 'tursu'], price: 55, unlockLv: 3 },
+  { id: 'patatesli', name: 'Patatesli Döner', required: ['et', 'patates', 'mayonez'], optional: ['ketchup', 'tursu'], price: 65, unlockLv: 3 },
+  { id: 'peynirli', name: 'Peynirli Döner', required: ['et', 'peynir', 'sogme'], optional: ['domates', 'mayonez'], price: 70, unlockLv: 4 },
+  { id: 'yumurtali', name: 'Yumurtalı Döner', required: ['et', 'yumurta', 'sogme'], optional: ['ketchup', 'biber'], price: 65, unlockLv: 4 },
+  { id: 'full', name: 'Full Döner', required: ['et', 'tursu', 'sogme', 'domates', 'ketchup', 'mayonez'], optional: ['biber', 'peynir'], price: 90, unlockLv: 5 },
+  { id: 'vegan', name: 'Vegan Döner', required: ['piyaz', 'domates', 'tursu', 'tzatziki'], optional: ['biber', 'avokado'], price: 75, unlockLv: 5 },
+  { id: 'truffle_doner', name: 'Truffle Döner', required: ['et', 'truffle', 'mantar'], optional: ['peynir'], price: 150, unlockLv: 8 },
+  { id: 'super', name: 'Süper Döner', required: ['et', 'tavuk', 'peynir', 'yumurta', 'patates', 'truffle'], optional: [], price: 200, unlockLv: 9 },
+];
+
+// ===== CUSTOMER TYPES =====
+const CUSTOMER_TYPES = [
+  { emoji: '👨', name: 'Adam', patience: 90, tip: 5, pickiness: 0.3 },
+  { emoji: '👩', name: 'Hanım', patience: 80, tip: 10, pickiness: 0.5 },
+  { emoji: '👴', name: 'Dede', patience: 60, tip: 15, pickiness: 0.2 },
+  { emoji: '👦', name: 'Çocuk', patience: 40, tip: 0, pickiness: 0.8 },
+  { emoji: '🧕', name: 'Teyze', patience: 70, tip: 8, pickiness: 0.4 },
+  { emoji: '👮', name: 'Polis', patience: 50, tip: 20, pickiness: 0.1 },
+  { emoji: '💼', name: 'İşadamı', patience: 30, tip: 30, pickiness: 0.6 },
+  { emoji: '🎓', name: 'Öğrenci', patience: 100, tip: 2, pickiness: 0.3 },
+  { emoji: '👨‍🍳', name: 'Aşçı', patience: 60, tip: 25, pickiness: 0.9 },
+  { emoji: '🤑', name: 'Zengin', patience: 20, tip: 50, pickiness: 0.7 },
+];
+
+// ===== RIVAL TYPES =====
+const RIVAL_TYPES = [
+  { name: 'Hızlı Burger', emoji: '🍔', hp: 80, attack: 15, defense: 10, reward: 200, icon: '😈' },
+  { name: 'Pizza Sarayı', emoji: '🍕', hp: 100, attack: 20, defense: 15, reward: 300, icon: '👹' },
+  { name: 'Çorba Evi', emoji: '🍲', hp: 60, attack: 10, defense: 20, reward: 150, icon: '😤' },
+  { name: 'Lahmacun Dünyası', emoji: '🫓', hp: 120, attack: 25, defense: 12, reward: 400, icon: '💀' },
+  { name: 'Pide Fabrikası', emoji: '🫓', hp: 150, attack: 30, defense: 20, reward: 500, icon: '🤬' },
+  { name: 'Döner Zinciri', emoji: '🥙', hp: 200, attack: 40, defense: 25, reward: 800, icon: '👑' },
+];
+
+// ===== UPGRADES =====
+const UPGRADES = [
+  { id: 'spit_quality', name: 'Şiş Kalitesi', emoji: '🔥', desc: 'Etlerin kalitesini artırır. +%10 kazanç/seviye', maxLevel: 5, baseCost: 150, effect: 'income', value: 0.1 },
+  { id: 'bread_quality', name: 'Ekmek Kalitesi', emoji: '🫓', desc: 'Daha iyi ekmek, daha mutlu müşteri', maxLevel: 5, baseCost: 200, effect: 'satisfaction', value: 0.1 },
+  { id: 'bigger_counter', name: 'Geniş Tezgah', emoji: '🔧', desc: 'Daha fazla malzeme slotu açılır', maxLevel: 3, baseCost: 300, effect: 'slots', value: 2 },
+  { id: 'speed', name: 'Hız Kursörü', emoji: '⚡', desc: 'Servis süresi azalır', maxLevel: 5, baseCost: 250, effect: 'speed', value: 0.15 },
+  { id: 'decoration', name: 'Dekorasyon', emoji: '🎨', desc: 'Dükkan görünümü iyileşir. +itebar', maxLevel: 4, baseCost: 350, effect: 'reputation', value: 5 },
+  { id: 'fridge', name: 'Soğutucu', emoji: '❄️', desc: 'Malzeme bozulmasını önler', maxLevel: 3, baseCost: 400, effect: 'freshness', value: 0.1 },
+  { id: 'tables_upgrade', name: 'Masa Yenileme', emoji: '🪑', desc: 'Mevcut masalar daha iyi hale gelir', maxLevel: 5, baseCost: 500, effect: 'table_quality', value: 1 },
+  { id: 'marketing', name: 'Reklam', emoji: '📣', desc: 'Daha fazla müşteri çeker', maxLevel: 5, baseCost: 300, effect: 'customers', value: 0.2 },
+  { id: 'music', name: 'Müzik Sistemi', emoji: '🎵', desc: 'Müşterilerin sabır süresi artar', maxLevel: 3, baseCost: 450, effect: 'patience', value: 0.15 },
+  { id: 'loyalty', name: 'Sadakat Kartı', emoji: '💳', desc: 'Müşteriler tekrar gelir', maxLevel: 3, baseCost: 600, effect: 'loyalty', value: 0.1 },
+  { id: 'premium_sauce', name: 'Premium Sos', emoji: '🔴', desc: 'Özel sosy reçetesi. +%15 kazanç', maxLevel: 5, baseCost: 350, effect: 'sauce_income', value: 0.15 },
+  { id: 'display', name: 'Vitrin', emoji: '🪟', desc: 'Dükkan dışarıdan cazip görünür', maxLevel: 3, baseCost: 250, effect: 'reputation', value: 8 },
+];
+
+// ===== STAFF =====
+const STAFF_TYPES = [
+  { id: 'kasiyer', name: 'Kasiyer', emoji: '💁', role: 'Para kabul eder, müşteri sabırını artırır', hirecost: 200, dailySalary: 50, effect: 'patience_boost', value: 0.2 },
+  { id: 'asistan', name: 'Asistan', emoji: '👨‍🍳', role: 'Malzemeleri hazırlar, servis hızını artırır', hirecost: 300, dailySalary: 80, effect: 'speed_boost', value: 0.25 },
+  { id: 'garson', name: 'Garson', emoji: '🤵', role: 'Masalara gider, bahşiş artırır', hirecost: 250, dailySalary: 60, effect: 'tip_boost', value: 0.3 },
+  { id: 'temizlikci', name: 'Temizlikçi', emoji: '🧹', role: 'Masaları hızlı temizler, döngüyü hızlandırır', hirecost: 150, dailySalary: 40, effect: 'table_reset', value: 0.4 },
+  { id: 'sef', name: 'Şef', emoji: '👨‍🍳', role: 'Tüm yemeklerin kalitesini artırır', hirecost: 800, dailySalary: 200, effect: 'all_boost', value: 0.15 },
+  { id: 'guvenlik', name: 'Güvenlik', emoji: '💪', role: 'Rakip saldırılarına karşı koruma sağlar', hirecost: 500, dailySalary: 120, effect: 'rival_defense', value: 0.3 },
+  { id: 'pazarlamaci', name: 'Pazarlamacı', emoji: '📢', role: 'İtibar puanını artırır', hirecost: 600, dailySalary: 150, effect: 'rep_boost', value: 0.2 },
+];
+
+// ===== LEVEL SYSTEM =====
+const LEVELS = [
+  { level: 1, name: 'Acemi', xpRequired: 0, tableCount: 4, unlocks: [] },
+  { level: 2, name: 'Çırak', xpRequired: 100, tableCount: 6, unlocks: ['patates', 'biber'] },
+  { level: 3, name: 'Kalfa', xpRequired: 250, tableCount: 8, unlocks: ['pide', 'peynir', 'yumurta'] },
+  { level: 4, name: 'Usta', xpRequired: 500, tableCount: 10, unlocks: ['sogan_kavurma', 'tzatziki'] },
+  { level: 5, name: 'Baş Usta', xpRequired: 900, tableCount: 12, unlocks: ['acisir', 'piyaz'] },
+  { level: 6, name: 'Şef', xpRequired: 1500, tableCount: 15, unlocks: ['mantar'] },
+  { level: 7, name: 'Baş Şef', xpRequired: 2500, tableCount: 18, unlocks: ['avokado'] },
+  { level: 8, name: 'Mutfak Ustası', xpRequired: 4000, tableCount: 22, unlocks: ['truffle'] },
+  { level: 9, name: 'Döner Efsanesi', xpRequired: 6500, tableCount: 28, unlocks: [] },
+  { level: 10, name: 'İmparator', xpRequired: 10000, tableCount: 35, unlocks: [] },
+  { level: 11, name: 'Efsane İmparator', xpRequired: 15000, tableCount: 42, unlocks: [] },
+  { level: 12, name: 'Ölümsüz Usta', xpRequired: 25000, tableCount: 50, unlocks: [] },
+];
+
+// ===== GAME DATA STRUCTURES =====
+let tables = [];
+let staff = [];
+let upgradeData = {};
+let gameLoop = null;
+let clockLoop = null;
+let spawnLoop = null;
+
+// ===== INITIALIZE UPGRADES =====
+function initUpgrades() {
+  UPGRADES.forEach(u => {
+    upgradeData[u.id] = { level: 0, purchased: false };
+  });
+}
+
+// ===== TABLES INIT =====
+function initTables() {
+  const lvlData = LEVELS[G.level - 1];
+  const maxTables = lvlData.tableCount;
+
+  // Keep existing tables, add new ones
+  while (tables.length < maxTables) {
+    const idx = tables.length;
+    const isRival = Math.random() < getRivalChance();
+    tables.push(createTable(idx, isRival));
+  }
+
+  // Lock tables beyond current count
+  tables.forEach((t, i) => {
+    t.locked = i >= maxTables;
+  });
+}
+
+function getRivalChance() {
+  // More rivals as game progresses
+  return Math.min(0.15 + (G.day * 0.01), 0.4);
+}
+
+function createTable(idx, isRival) {
+  if (isRival) {
+    const rival = RIVAL_TYPES[Math.floor(Math.random() * Math.min(RIVAL_TYPES.length, G.level))];
+    return {
+      id: idx,
+      type: 'rival',
+      locked: false,
+      rivalData: { ...rival, currentHp: rival.hp },
+      status: 'rival',
+      customers: [],
+      order: null,
+      timer: 0,
+      maxTimer: 0,
+      satisfaction: 0,
+    };
+  }
+  return {
+    id: idx,
+    type: 'normal',
+    locked: false,
+    status: 'empty',
+    customers: [],
+    order: null,
+    timer: 0,
+    maxTimer: 100,
+    satisfaction: 5,
+    paid: false,
+  };
+}
+
+// ===== START GAME =====
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('game').classList.add('active');
+
+  initUpgrades();
+  initTables();
+  renderIngredients();
+  renderTables();
+  renderUpgrades();
+  renderStaff();
+  renderMenu();
+  startGameLoops();
+  addLog('🥙 Dükkan açıldı! Müşterileri bekle!', 'info');
+  notify('Döner İmparatorluğuna Hoş Geldin! 🥙', 'gold');
+}
+
+// ===== GAME LOOPS =====
+function startGameLoops() {
+  // Main tick: every 1 second = game time progresses
+  gameLoop = setInterval(gameTick, 1000);
+  clockLoop = setInterval(clockTick, 1000);
+  spawnLoop = setInterval(spawnCustomers, 3000);
+}
+
+function gameTick() {
+  if (!G.isOpen || G.battleActive) return;
+
+  // Update table timers
+  tables.forEach(t => {
+    if (t.locked || t.type === 'rival' || t.status === 'empty') return;
+
+    if (t.status === 'waiting') {
+      t.timer -= 1 + getUpgradeEffect('speed') * 0.5;
+      if (t.timer <= 0) {
+        // Customer left angry
+        customerLeft(t, false);
+      }
+    } else if (t.status === 'eating') {
+      t.timer -= 1;
+      if (t.timer <= 0) {
+        tableFinished(t);
+      }
+    }
+  });
+
+  // Auto-serve by staff
+  if (hasStaff('asistan') && G.selectedTable !== null) {
+    const t = tables[G.selectedTable];
+    if (t && t.status === 'waiting') {
+      autoServeByStaff();
+    }
+  }
+
+  // Staff effects
+  if (hasStaff('temizlikci')) {
+    tables.forEach(t => {
+      if (t.status === 'empty' && t.type === 'normal') {
+        // Faster reset handled in tableFinished
+      }
+    });
+  }
+
+  // Meat level
+  if (G.meatLevel > 0) {
+    G.meatLevel -= 0.1;
+    updateMeatTip();
+  }
+
+  renderTables();
+  updateTopBar();
+}
+
+function clockTick() {
+  if (!G.isOpen) return;
+  G.minute += 2;
+  if (G.minute >= 60) { G.minute = 0; G.hour++; }
+  if (G.hour >= 22) {
+    closeDay();
+  }
+  updateClock();
+  updateNightEffect();
+}
+
+function spawnCustomers() {
+  if (!G.isOpen || G.battleActive) return;
+
+  const emptyTables = tables.filter(t => !t.locked && t.type === 'normal' && t.status === 'empty');
+  if (emptyTables.length === 0) return;
+
+  const marketingBoost = 1 + getUpgradeEffect('customers');
+  const reputationBoost = 1 + (G.reputation / 200);
+  const spawnChance = Math.min(0.8, 0.3 * marketingBoost * reputationBoost);
+
+  emptyTables.forEach(t => {
+    if (Math.random() < spawnChance * 0.4) {
+      spawnCustomerAtTable(t);
+    }
+  });
+}
+
+function spawnCustomerAtTable(table) {
+  const count = Math.floor(Math.random() * 3) + 1;
+  const customers = [];
+  for (let i = 0; i < count; i++) {
+    customers.push(CUSTOMER_TYPES[Math.floor(Math.random() * CUSTOMER_TYPES.length)]);
+  }
+
+  // Pick a random available order
+  const available = ORDER_TYPES.filter(o => o.unlockLv <= G.level);
+  const order = available[Math.floor(Math.random() * available.length)];
+
+  const patienceBoost = 1 + getUpgradeEffect('patience');
+  const musicBoost = hasStaff('kasiyer') ? 1.3 : 1;
+  const basePatience = Math.max(...customers.map(c => c.patience));
+
+  table.customers = customers;
+  table.order = { ...order, extras: randomExtras(order, customers) };
+  table.status = 'waiting';
+  table.timer = basePatience * patienceBoost * musicBoost;
+  table.maxTimer = table.timer;
+  table.satisfaction = 5;
+  table.paid = false;
+
+  renderTables();
+}
+
+function randomExtras(order, customers) {
+  const extras = [];
+  const picky = Math.max(...customers.map(c => c.pickiness));
+  if (picky < 0.5) {
+    order.optional.forEach(o => {
+      if (Math.random() < 0.6) extras.push(o);
+    });
+  }
+  return extras;
+}
+
+// ===== SERVE SYSTEM =====
+function toggleIngredient(ingredientId) {
+  const ing = INGREDIENTS.find(i => i.id === ingredientId);
+  if (!ing || ing.unlockLv > G.level) return;
+
+  const idx = G.selectedIngredients.indexOf(ingredientId);
+  if (idx === -1) {
+    G.selectedIngredients.push(ingredientId);
+  } else {
+    G.selectedIngredients.splice(idx, 1);
+  }
+  renderIngredients();
+  updateDonerPreview();
+  checkServeButton();
+}
+
+function updateDonerPreview() {
+  const preview = document.getElementById('doner-preview');
+  preview.innerHTML = '';
+  G.selectedIngredients.forEach(id => {
+    const ing = INGREDIENTS.find(i => i.id === id);
+    if (ing) {
+      const tag = document.createElement('div');
+      tag.className = 'ingredient-tag';
+      tag.innerHTML = `${ing.emoji} ${ing.name} <button onclick="removeIngredient('${id}')">✕</button>`;
+      preview.appendChild(tag);
+    }
+  });
+}
+
+function removeIngredient(id) {
+  const idx = G.selectedIngredients.indexOf(id);
+  if (idx !== -1) G.selectedIngredients.splice(idx, 1);
+  renderIngredients();
+  updateDonerPreview();
+  checkServeButton();
+}
+
+function checkServeButton() {
+  const btn = document.getElementById('serve-btn');
+  btn.disabled = G.selectedTable === null || G.selectedIngredients.length === 0;
+}
+
+function serveDoner() {
+  if (G.selectedTable === null) { notify('Önce bir masa seç! 📋', 'bad'); return; }
+  const table = tables[G.selectedTable];
+  if (!table || table.status !== 'waiting') { notify('Bu masada bekleyen müşteri yok!', 'bad'); return; }
+  if (G.selectedIngredients.length === 0) { notify('Malzeme seçmelisin!', 'bad'); return; }
+
+  evaluateOrder(table, G.selectedIngredients);
+  G.selectedIngredients = [];
+  G.selectedTable = null;
+  renderIngredients();
+  updateDonerPreview();
+  checkServeButton();
+  renderTables();
+}
+
+function evaluateOrder(table, served) {
+  const order = table.order;
+  const required = order.required;
+  const extras = order.extras || [];
+  const allWanted = [...required, ...extras];
+
+  let score = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let missing = [];
+
+  required.forEach(r => {
+    if (served.includes(r)) { correctCount++; score += 2; }
+    else { missing.push(r); score -= 1; }
+  });
+  extras.forEach(e => {
+    if (served.includes(e)) { correctCount++; score += 1; }
+  });
+  served.forEach(s => {
+    if (!allWanted.includes(s)) { wrongCount++; score -= 0.5; }
+  });
+
+  const perfectMatch = missing.length === 0 && wrongCount === 0;
+  const qualityBoost = 1 + getUpgradeEffect('income') + getUpgradeEffect('sauce_income');
+  const shefBoost = hasStaff('sef') ? 1.2 : 1;
+
+  let earned = order.price * qualityBoost * shefBoost;
+  let satisfaction = Math.max(1, Math.min(5, Math.round(2.5 + score)));
+
+  // Tip
+  const garsonBoost = hasStaff('garson') ? 1.3 : 1;
+  const tip = table.customers.reduce((sum, c) => sum + (satisfaction >= 4 ? c.tip : 0), 0) * garsonBoost;
+  earned += tip;
+
+  if (perfectMatch) {
+    earned *= 1.2;
+    addCombo();
+    showCombo(G.combo);
+    notify(`Mükemmel! +${earned.toFixed(0)}₺ 🥙`, 'good');
+    addLog(`🌟 Masa ${table.id + 1}: Mükemmel servis! +${earned.toFixed(0)}₺`, 'gold');
+    spawnConfetti();
+  } else if (satisfaction >= 3) {
+    notify(`İyi! +${earned.toFixed(0)}₺`, 'good');
+    addLog(`✅ Masa ${table.id + 1}: İyi servis +${earned.toFixed(0)}₺`, 'good');
+    resetCombo();
+  } else {
+    earned *= 0.7;
+    notify(`Kötü sipariş! Müşteri memnun değil!`, 'bad');
+    addLog(`❌ Masa ${table.id + 1}: Yanlış sipariş!`, 'bad');
+    resetCombo();
+  }
+
+  addMoney(earned);
+  addXP(perfectMatch ? 15 : satisfaction >= 3 ? 8 : 2);
+  G.reputation += (satisfaction - 2.5) * 0.5;
+  G.reputation = Math.max(0, G.reputation);
+  G.totalServed++;
+  G.dayServed++;
+
+  // Table starts eating
+  table.status = 'eating';
+  table.satisfaction = satisfaction;
+  table.timer = 20 + Math.random() * 20; // eating time
+  table.maxTimer = table.timer;
+}
+
+function customerLeft(table, paid) {
+  if (!paid) {
+    addLog(`😤 Masa ${table.id + 1}: Müşteri sabredemedi, gitti!`, 'bad');
+    G.reputation -= 2;
+    G.reputation = Math.max(0, G.reputation);
+    notify('Müşteri gitti! 😤', 'bad');
+    resetCombo();
+  }
+  table.status = 'empty';
+  table.customers = [];
+  table.order = null;
+  table.timer = 0;
+  table.satisfaction = 0;
+}
+
+function tableFinished(table) {
+  addLog(`😊 Masa ${table.id + 1}: Müşteriler yedi, gitti!`, 'good');
+  table.status = 'empty';
+  table.customers = [];
+  table.order = null;
+  table.timer = 0;
+}
+
+// ===== RIVAL BATTLE =====
+function openRivalBattle(tableIdx) {
+  const table = tables[tableIdx];
+  if (!table || table.type !== 'rival') return;
+
+  const rival = table.rivalData;
+  G.battleActive = true;
+  G.battleData = {
+    tableIdx,
+    playerHp: 100 + G.level * 10,
+    maxPlayerHp: 100 + G.level * 10,
+    rivalHp: rival.hp,
+    maxRivalHp: rival.hp,
+    rival,
+    round: 0,
+    specialUsed: false,
+  };
+
+  document.getElementById('rival-avatar').textContent = rival.icon;
+  document.getElementById('rival-name').textContent = rival.name;
+  updateBattleHpBars();
+  document.getElementById('battle-log-text').textContent = `${rival.name} sana meydan okuyor!`;
+  document.getElementById('battle-overlay').classList.add('active');
+  document.getElementById('battle-special').disabled = false;
+}
+
+function battleAction(action) {
+  if (!G.battleData) return;
+  const bd = G.battleData;
+  const rival = bd.rival;
+  let playerDmg = 0, rivalDmg = 0;
+  let logText = '';
+
+  const defenseBoost = hasStaff('guvenlik') ? 0.7 : 1;
+  const reputationAttack = 1 + G.reputation / 100;
+
+  switch (action) {
+    case 'fast':
+      playerDmg = Math.floor((10 + G.level * 2) * reputationAttack * (Math.random() * 0.5 + 0.75));
+      rivalDmg = Math.floor(rival.attack * 0.8 * defenseBoost);
+      logText = `Hızlı servis! ${playerDmg} hasar verdin, ${rivalDmg} hasar aldın!`;
+      break;
+    case 'quality':
+      playerDmg = Math.floor((15 + G.level * 3) * reputationAttack * (Math.random() * 0.5 + 0.75));
+      rivalDmg = Math.floor(rival.attack * 1.1 * defenseBoost);
+      logText = `Kaliteli döner! ${playerDmg} hasar verdin!`;
+      break;
+    case 'special':
+      if (bd.specialUsed) { notify('Özel tarif bir kez kullanılır!', 'bad'); return; }
+      playerDmg = Math.floor((30 + G.level * 5) * reputationAttack);
+      rivalDmg = Math.floor(rival.attack * 0.5 * defenseBoost);
+      logText = `✨ ÖZEL TARİF! ${playerDmg} büyük hasar!`;
+      bd.specialUsed = true;
+      document.getElementById('battle-special').disabled = true;
+      break;
+    case 'defend':
+      playerDmg = Math.floor((5 + G.level) * reputationAttack);
+      rivalDmg = Math.floor(rival.attack * 0.3 * defenseBoost);
+      logText = `Savunma! Sadece ${rivalDmg} hasar aldın!`;
+      break;
+  }
+
+  bd.rivalHp -= playerDmg;
+  bd.playerHp -= rivalDmg;
+  bd.round++;
+
+  document.getElementById('battle-log-text').textContent = logText;
+  updateBattleHpBars();
+
+  if (bd.rivalHp <= 0) {
+    setTimeout(() => endBattle(true), 800);
+  } else if (bd.playerHp <= 0) {
+    setTimeout(() => endBattle(false), 800);
+  }
+}
+
+function endBattle(won) {
+  const bd = G.battleData;
+  document.getElementById('battle-overlay').classList.remove('active');
+  G.battleActive = false;
+
+  if (won) {
+    const reward = bd.rival.reward + G.level * 50;
+    addMoney(reward);
+    G.reputation += 20;
+    addXP(50);
+    // Convert rival table to normal
+    tables[bd.tableIdx].type = 'normal';
+    tables[bd.tableIdx].status = 'empty';
+    tables[bd.tableIdx].customers = [];
+    tables[bd.tableIdx].order = null;
+    addLog(`🏆 ${bd.rival.name} yenildi! +${reward}₺ kazandın!`, 'gold');
+    notify(`RAKİP YENİLDİ! +${reward}₺ 🏆`, 'gold');
+    spawnConfetti();
+    renderTables();
+  } else {
+    G.money = Math.max(0, G.money - 100);
+    G.reputation = Math.max(0, G.reputation - 10);
+    addLog(`💀 ${bd.rival.name} kazandı! 100₺ kaybettin.`, 'bad');
+    notify('Savaşı kaybettin! 😭', 'bad');
+  }
+  G.battleData = null;
+}
+
+function updateBattleHpBars() {
+  const bd = G.battleData;
+  const pPct = Math.max(0, bd.playerHp / bd.maxPlayerHp * 100);
+  const rPct = Math.max(0, bd.rivalHp / bd.maxRivalHp * 100);
+  document.getElementById('player-hp-fill').style.width = pPct + '%';
+  document.getElementById('rival-hp-fill').style.width = rPct + '%';
+  document.getElementById('player-hp-text').textContent = Math.max(0, bd.playerHp) + ' HP';
+  document.getElementById('rival-hp-text').textContent = Math.max(0, bd.rivalHp) + ' HP';
+}
+
+// ===== STAFF =====
+function hasStaff(id) {
+  return staff.some(s => s.id === id);
+}
+
+function hireStaff(staffId) {
+  const type = STAFF_TYPES.find(s => s.id === staffId);
+  if (!type) return;
+  if (G.money < type.hirecost) { notify('Yeterli para yok!', 'bad'); return; }
+  if (hasStaff(staffId)) { notify('Bu çalışan zaten işe alındı!', 'bad'); return; }
+
+  G.money -= type.hirecost;
+  staff.push({ ...type, energy: 100 });
+  addLog(`👤 ${type.name} işe alındı!`, 'good');
+  notify(`${type.emoji} ${type.name} işe alındı!`, 'good');
+  renderStaff();
+  updateTopBar();
+}
+
+function autoServeByStaff() {
+  // Staff asistan auto-picks some ingredients for the selected table
+  if (G.selectedTable === null) return;
+  const table = tables[G.selectedTable];
+  if (!table || table.status !== 'waiting') return;
+
+  const order = table.order;
+  const required = order.required;
+
+  // Auto add required ingredients
+  required.forEach(r => {
+    if (!G.selectedIngredients.includes(r) && INGREDIENTS.find(i => i.id === r && i.unlockLv <= G.level)) {
+      G.selectedIngredients.push(r);
+    }
+  });
+
+  renderIngredients();
+  updateDonerPreview();
+  checkServeButton();
+}
+
+// ===== UPGRADES =====
+function buyUpgrade(upgradeId) {
+  const upg = UPGRADES.find(u => u.id === upgradeId);
+  if (!upg) return;
+  const data = upgradeData[upgradeId];
+  if (data.level >= upg.maxLevel) { notify('Maksimum seviyeye ulaşıldı!', 'bad'); return; }
+
+  const cost = Math.floor(upg.baseCost * Math.pow(1.8, data.level));
+  if (G.money < cost) { notify('Yeterli para yok!', 'bad'); return; }
+
+  G.money -= cost;
+  data.level++;
+
+  applyUpgradeEffect(upg, data.level);
+  addLog(`⬆️ ${upg.name} Seviye ${data.level} satın alındı!`, 'gold');
+  notify(`${upg.emoji} ${upg.name} geliştirildi! Lv.${data.level}`, 'good');
+  renderUpgrades();
+  updateTopBar();
+}
+
+function applyUpgradeEffect(upg, newLevel) {
+  if (upg.effect === 'reputation') {
+    G.reputation += upg.value;
+  } else if (upg.effect === 'slots') {
+    // More ingredient slots - handled in renderIngredients
+  }
+}
+
+function getUpgradeEffect(effectType) {
+  let total = 0;
+  UPGRADES.forEach(upg => {
+    if (upg.effect === effectType) {
+      const data = upgradeData[upg.id];
+      total += upg.value * data.level;
+    }
+  });
+  return total;
+}
+
+// ===== XP & LEVELS =====
+function addXP(amount) {
+  G.xp += amount;
+  const nextLevelData = LEVELS[G.level]; // next level
+  if (nextLevelData && G.xp >= nextLevelData.xpRequired) {
+    levelUp();
+  }
+}
+
+function levelUp() {
+  G.level++;
+  const levelData = LEVELS[G.level - 1];
+  const rewards = [];
+
+  // Unlock new ingredients
+  if (levelData.unlocks && levelData.unlocks.length > 0) {
+    levelData.unlocks.forEach(id => {
+      const ing = INGREDIENTS.find(i => i.id === id);
+      if (ing) rewards.push(`🔓 ${ing.emoji} ${ing.name} malzemesi açıldı!`);
+    });
+  }
+  rewards.push(`🪑 ${levelData.tableCount} masaya kadar genişleyebilirsin!`);
+  rewards.push(`⭐ Yeni unvan: ${levelData.name}!`);
+
+  // Show level up screen
+  document.getElementById('levelup-text').textContent = `Seviye ${G.level}: ${levelData.name}!`;
+  const rewardList = document.getElementById('levelup-rewards');
+  rewardList.innerHTML = rewards.map(r => `<li>${r}</li>`).join('');
+  document.getElementById('levelup-screen').classList.add('active');
+
+  // New tables
+  initTables();
+  renderIngredients();
+  renderTables();
+  renderUpgrades();
+  addLog(`🏆 SEVİYE ATLANDI! Lv.${G.level} ${levelData.name}`, 'gold');
+  spawnConfetti();
+}
+
+function closeLevelup() {
+  document.getElementById('levelup-screen').classList.remove('active');
+}
+
+// ===== DAY END =====
+function closeDay() {
+  if (!G.isOpen) return;
+  G.isOpen = false;
+
+  // Pay salaries
+  let totalSalary = 0;
+  staff.forEach(s => { totalSalary += s.dailySalary; G.money -= s.dailySalary; });
+
+  const report = document.getElementById('income-report');
+  report.innerHTML = `
+    <div class="income-report">
+      <div class="income-row"><span>📅 Gün ${G.day}</span></div>
+      <div class="income-row"><span>🥙 Servis Sayısı</span><span>${G.dayServed}</span></div>
+      <div class="income-row"><span>💰 Kazanç</span><span>${G.dayEarned.toFixed(0)}₺</span></div>
+      <div class="income-row"><span>👥 Maaşlar</span><span>-${totalSalary}₺</span></div>
+      <div class="income-row"><span>⭐ İtibar</span><span>${G.reputation.toFixed(0)}</span></div>
+      <div class="income-row total"><span>💼 Toplam Para</span><span>${G.money.toFixed(0)}₺</span></div>
+    </div>
+  `;
+  document.getElementById('closed-overlay').classList.add('active');
+}
+
+function closeDayManually() {
+  if (!G.isOpen) return;
+  closeDay();
+}
+
+function startNewDay() {
+  G.day++;
+  G.isOpen = true;
+  G.hour = 8;
+  G.minute = 0;
+  G.dayEarned = 0;
+  G.dayServed = 0;
+  G.meatLevel = 100;
+
+  document.getElementById('closed-overlay').classList.remove('active');
+
+  // Some rival tables reset, new rivals might appear
+  tables.forEach(t => {
+    if (t.status === 'empty' && Math.random() < 0.1 && G.day > 2) {
+      t.type = 'rival';
+      const rival = RIVAL_TYPES[Math.floor(Math.random() * Math.min(RIVAL_TYPES.length, G.level))];
+      t.rivalData = { ...rival, currentHp: rival.hp };
+      t.status = 'rival';
+      t.customers = [];
+      t.order = null;
+    }
+  });
+
+  initTables();
+  renderTables();
+  addLog(`☀️ ${G.day}. Gün başladı!`, 'info');
+  notify(`☀️ ${G.day}. Gün başladı!`, 'gold');
+}
+
+// ===== SHOP MODAL =====
+function openShopModal() {
+  showModal(
+    '🏪 Dükkan Yönetimi',
+    `<div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div style="font-size:0.85rem;color:var(--muted)">Dükkan Adın: <strong style="color:var(--accent2)">${document.getElementById('shop-name-text').textContent}</strong></div>
+      <div style="font-size:0.85rem">💰 Para: <strong style="color:var(--gold)">${G.money.toFixed(0)}₺</strong></div>
+      <div style="font-size:0.85rem">⭐ İtibar: <strong>${G.reputation.toFixed(0)}</strong></div>
+      <div style="font-size:0.85rem">🏆 Toplam Servis: <strong>${G.totalServed}</strong></div>
+      <div style="font-size:0.85rem">📅 Gün: <strong>${G.day}</strong></div>
+      <hr style="border-color:#5a2000">
+      <div style="font-size:0.75rem;color:var(--muted)">Dükkan adını değiştirmek için tıkla:</div>
+      <input id="shop-name-input" type="text" value="${document.getElementById('shop-name-text').textContent}"
+        style="background:var(--panel2);border:1px solid var(--accent);border-radius:6px;padding:0.4rem 0.6rem;color:var(--text);width:100%;font-family:Nunito,sans-serif">
+    </div>`,
+    [
+      { label: '💾 Kaydet', cls: 'btn-confirm', fn: () => {
+        const val = document.getElementById('shop-name-input').value.trim();
+        if (val) {
+          document.getElementById('shop-name-text').textContent = val;
+          notify('Dükkan adı değiştirildi!', 'good');
+        }
+        closeModal();
+      }},
+      { label: 'İptal', cls: 'btn-cancel', fn: closeModal },
+    ]
+  );
+}
+
+function showModal(title, body, btns) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  const btnContainer = document.getElementById('modal-btns');
+  btnContainer.innerHTML = '';
+  btns.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-modal ' + b.cls;
+    btn.textContent = b.label;
+    btn.onclick = b.fn;
+    btnContainer.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+// ===== TABLE SELECT =====
+function selectTable(idx) {
+  const table = tables[idx];
+  if (!table) return;
+
+  if (table.locked) {
+    const cost = getTableUnlockCost(idx);
+    showModal(
+      '🔒 Masayı Aç',
+      `<p>Bu masayı açmak için <strong style="color:var(--gold)">${cost}₺</strong> gerekiyor.</p>`,
+      [
+        { label: `${cost}₺ ile Aç`, cls: 'btn-confirm', fn: () => { unlockTable(idx); closeModal(); }},
+        { label: 'İptal', cls: 'btn-cancel', fn: closeModal }
+      ]
+    );
+    return;
+  }
+
+  if (table.type === 'rival') {
+    openRivalBattle(idx);
+    return;
+  }
+
+  if (table.status === 'waiting') {
+    // Select this table for serving
+    G.selectedTable = idx;
+    renderTables();
+    // Auto-fill with staff if available
+    if (hasStaff('asistan')) autoServeByStaff();
+    checkServeButton();
+    addLog(`📋 Masa ${idx + 1} seçildi. Sipariş: ${table.order.name}`, 'info');
+  } else if (table.status === 'empty') {
+    notify('Masa boş - müşteri bekleniyor!', 'info');
+  } else if (table.status === 'eating') {
+    notify('Müşteriler yiyor...', 'info');
+  }
+}
+
+function getTableUnlockCost(idx) {
+  return Math.floor(200 * Math.pow(1.3, idx));
+}
+
+function unlockTable(idx) {
+  const cost = getTableUnlockCost(idx);
+  if (G.money < cost) { notify('Yeterli para yok!', 'bad'); return; }
+  G.money -= cost;
+  tables[idx].locked = false;
+  addLog(`🔓 Masa ${idx + 1} açıldı!`, 'gold');
+  renderTables();
+  updateTopBar();
+}
+
+// ===== MONEY =====
+function addMoney(amount) {
+  G.money += amount;
+  G.dayEarned += amount;
+  G.totalEarned += amount;
+  spawnFloatingCoin(amount);
+}
+
+function spawnFloatingCoin(amount) {
+  const coin = document.createElement('div');
+  coin.className = 'floating-coin';
+  coin.textContent = `+${Math.round(amount)}₺`;
+  coin.style.left = (Math.random() * 60 + 20) + '%';
+  coin.style.top = (Math.random() * 40 + 30) + '%';
+  document.body.appendChild(coin);
+  setTimeout(() => coin.remove(), 1000);
+}
+
+// ===== COMBO SYSTEM =====
+function addCombo() {
+  G.combo++;
+  clearTimeout(G.comboTimer);
+  G.comboTimer = setTimeout(resetCombo, 8000);
+}
+
+function resetCombo() {
+  G.combo = 0;
+}
+
+function showCombo(count) {
+  if (count < 2) return;
+  const el = document.getElementById('combo-display');
+  el.textContent = `${count}x COMBO! 🔥`;
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.style.animation = 'comboPop 0.8s ease-out forwards';
+  setTimeout(() => { el.style.display = 'none'; }, 800);
+}
+
+// ===== CONFETTI =====
+function spawnConfetti() {
+  const colors = ['#ff6b00', '#ffaa00', '#00e676', '#00b0ff', '#ffd700', '#ff1744'];
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-10px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDelay = Math.random() * 0.5 + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 2000);
+    }, i * 50);
+  }
+}
+
+// ===== LOG =====
+function addLog(text, type = '') {
+  const list = document.getElementById('log-list');
+  const li = document.createElement('li');
+  li.className = type;
+  li.textContent = text;
+  list.prepend(li);
+  // Keep max 50 entries
+  while (list.children.length > 50) list.lastChild.remove();
+}
+
+// ===== NOTIFICATIONS =====
+function notify(text, type = '') {
+  const container = document.getElementById('notifications');
+  const el = document.createElement('div');
+  el.className = 'notif ' + type;
+  el.textContent = text;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.5s';
+    setTimeout(() => el.remove(), 500);
+  }, 2500);
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== UPDATE CLOCK =====
+function updateClock() {
+  const h = String(G.hour).padStart(2, '0');
+  const m = String(G.minute).padStart(2, '0');
+  document.getElementById('time-val').textContent = `${h}:${m}`;
+}
+
+function updateNightEffect() {
+  const overlay = document.getElementById('night-overlay');
+  const nightness = Math.max(0, (G.hour - 18) / 4);
+  overlay.style.opacity = nightness;
+}
+
+// ===== UPDATE TOP BAR =====
+function updateTopBar() {
+  document.getElementById('money-val').textContent = Math.floor(G.money) + '₺';
+  document.getElementById('day-val').textContent = G.day + '. Gün';
+  document.getElementById('rep-val').textContent = Math.floor(G.reputation);
+  const lvlData = LEVELS[Math.min(G.level - 1, LEVELS.length - 1)];
+  document.getElementById('lvl-val').textContent = `Lv.${G.level} ${lvlData.name}`;
+}
+
+function updateMeatTip() {
+  const el = document.getElementById('meat-level-tip');
+  if (el) el.textContent = Math.floor(G.meatLevel) + '%';
+}
+
+// ===== RENDER INGREDIENTS =====
+function renderIngredients() {
+  const area = document.getElementById('prep-area');
+  area.innerHTML = '';
+
+  const extraSlots = getUpgradeEffect('slots') * 2;
+  const maxVisible = 12 + extraSlots;
+
+  let shown = 0;
+  INGREDIENTS.forEach(ing => {
+    if (shown >= maxVisible) return;
+    const isUnlocked = ing.unlockLv <= G.level;
+    const isSelected = G.selectedIngredients.includes(ing.id);
+
+    const slot = document.createElement('div');
+    slot.className = 'prep-slot tooltip-wrap' + (isUnlocked ? '' : ' locked') + (isSelected ? ' selected' : '');
+    slot.innerHTML = `
+      <span>${ing.emoji}</span>
+      <span class="slot-label">${ing.name}</span>
+      <div class="tooltip-box">${ing.name} - Lv.${ing.unlockLv} ${isUnlocked ? '✅' : '🔒'}</div>
+    `;
+    if (isUnlocked) {
+      slot.onclick = () => toggleIngredient(ing.id);
+    }
+    area.appendChild(slot);
+    shown++;
+  });
+}
+
+// ===== RENDER TABLES =====
+function renderTables() {
+  const container = document.getElementById('tables-container');
+  container.innerHTML = '';
+
+  tables.forEach((table, idx) => {
+    const card = document.createElement('div');
+    card.className = 'table-card' + (table.locked ? ' locked' : '') + (idx === G.selectedTable ? ' selected' : '') + (table.type === 'rival' ? ' rival' : '') + (table.status === 'empty' ? ' empty' : '');
+
+    let content = `<div class="table-num">T${idx + 1}</div>`;
+
+    if (table.locked) {
+      const cost = getTableUnlockCost(idx);
+      content += `
+        <div class="table-status status-locked">🔒 KİLİTLİ</div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem">Aç: ${cost}₺</div>
+      `;
+      card.onclick = () => selectTable(idx);
+    } else if (table.type === 'rival') {
+      const rival = table.rivalData;
+      const hpPct = (rival.currentHp / rival.hp * 100) + '%';
+      content += `
+        <div class="rival-badge">RAKİP</div>
+        <div class="table-status status-rival">${rival.icon} ${rival.name}</div>
+        <div style="font-size:1.5rem;text-align:center;margin:0.3rem 0">${rival.emoji}</div>
+        <div class="table-timer" style="margin-top:0.2rem">
+          <div class="table-timer-fill" style="width:${hpPct};background:var(--rival)"></div>
+        </div>
+        <div class="rival-hp">${rival.currentHp}/${rival.hp} HP</div>
+        <div style="font-size:0.6rem;color:var(--muted);margin-top:0.2rem">Ödül: ${rival.reward}₺</div>
+      `;
+      card.onclick = () => selectTable(idx);
+    } else {
+      // Normal table
+      let statusClass = 'status-empty';
+      let statusText = '🪑 Boş';
+
+      if (table.status === 'waiting') {
+        statusClass = 'status-waiting';
+        statusText = '⏳ Bekliyor';
+        if (table.timer / table.maxTimer < 0.3) { statusClass = 'status-angry'; statusText = '😤 Sabırsız!'; }
+      } else if (table.status === 'eating') {
+        statusClass = 'status-eating';
+        statusText = '😋 Yiyor';
+      }
+
+      const customers = table.customers.map(c => `<span class="customer-avatar">${c.emoji}</span>`).join('');
+      const stars = table.satisfaction > 0
+        ? [1,2,3,4,5].map(s => `<span class="star${s <= table.satisfaction ? ' lit' : ''}">★</span>`).join('')
+        : '';
+
+      let timerHTML = '';
+      if (table.status === 'waiting' && table.maxTimer > 0) {
+        const pct = Math.max(0, table.timer / table.maxTimer * 100);
+        const color = pct > 60 ? 'var(--green)' : pct > 30 ? 'var(--accent2)' : 'var(--red)';
+        timerHTML = `<div class="table-timer"><div class="table-timer-fill" style="width:${pct}%;background:${color}"></div></div>`;
+      } else if (table.status === 'eating' && table.maxTimer > 0) {
+        const pct = Math.max(0, table.timer / table.maxTimer * 100);
+        timerHTML = `<div class="table-timer"><div class="table-timer-fill" style="width:${pct}%;background:var(--blue)"></div></div>`;
+      }
+
+      let orderText = '';
+      if (table.order) {
+        const required = table.order.required.map(r => {
+          const ing = INGREDIENTS.find(i => i.id === r);
+          return ing ? ing.emoji : '?';
+        }).join('');
+        const extras = (table.order.extras || []).map(e => {
+          const ing = INGREDIENTS.find(i => i.id === e);
+          return ing ? ing.emoji : '';
+        }).join('');
+        orderText = `${table.order.name} ${required}${extras ? ' +' + extras : ''} • ${table.order.price}₺`;
+      }
+
+      content += `
+        <div class="table-status ${statusClass}">${statusText}</div>
+        <div class="table-customers">${customers || '<span style="font-size:0.7rem;color:#555">boş</span>'}</div>
+        ${table.order ? `<div class="table-order">${orderText}</div>` : ''}
+        ${timerHTML}
+        ${stars ? `<div class="table-satisfaction">${stars}</div>` : ''}
+      `;
+      card.onclick = () => selectTable(idx);
+    }
+
+    card.innerHTML = content;
+    container.appendChild(card);
+  });
+}
+
+// ===== RENDER UPGRADES =====
+function renderUpgrades() {
+  const list = document.getElementById('upgrades-list');
+  list.innerHTML = '';
+
+  UPGRADES.forEach(upg => {
+    const data = upgradeData[upg.id];
+    const isMaxed = data.level >= upg.maxLevel;
+    const cost = isMaxed ? 0 : Math.floor(upg.baseCost * Math.pow(1.8, data.level));
+    const canAfford = G.money >= cost;
+
+    const card = document.createElement('div');
+    card.className = 'upgrade-card' + (isMaxed ? ' maxed' : '') + (!canAfford && !isMaxed ? ' cant-afford' : '');
+
+    const dots = Array.from({length: upg.maxLevel}, (_, i) =>
+      `<div class="dot${i < data.level ? ' filled' : ''}"></div>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="upgrade-header">
+        <div class="upgrade-name">${upg.emoji} ${upg.name}</div>
+        <div class="upgrade-cost">${isMaxed ? 'MAX' : cost + '₺'}</div>
+      </div>
+      <div class="upgrade-desc">${upg.desc}</div>
+      <div class="upgrade-progress">
+        <div class="upgrade-level-dots">${dots}</div>
+      </div>
+    `;
+    if (!isMaxed) card.onclick = () => buyUpgrade(upg.id);
+    list.appendChild(card);
+  });
+}
+
+// ===== RENDER STAFF =====
+function renderStaff() {
+  const list = document.getElementById('staff-list');
+  list.innerHTML = '';
+
+  STAFF_TYPES.forEach(type => {
+    const hired = hasStaff(type.id);
+    const canAfford = G.money >= type.hirecost;
+
+    const card = document.createElement('div');
+    card.className = 'staff-card';
+    card.innerHTML = `
+      <div class="staff-avatar">${type.emoji}</div>
+      <div class="staff-info">
+        <div class="staff-name">${type.name}</div>
+        <div class="staff-role">${type.role}</div>
+        ${hired ? `<div class="staff-bar-wrap"><div class="staff-bar-fill" style="width:100%"></div></div>` : ''}
+        <div style="font-size:0.6rem;color:var(--muted);margin-top:2px">Maaş: ${type.dailySalary}₺/gün</div>
+      </div>
+      ${hired
+        ? '<div style="font-size:0.7rem;color:var(--green);font-weight:700">✅ Çalışıyor</div>'
+        : `<button class="btn-hire" ${!canAfford ? 'disabled' : ''} onclick="hireStaff('${type.id}')">${type.hirecost}₺</button>`
+      }
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ===== RENDER MENU =====
+function renderMenu() {
+  const list = document.getElementById('menu-list');
+  list.innerHTML = '';
+
+  ORDER_TYPES.forEach(order => {
+    const unlocked = order.unlockLv <= G.level;
+    const card = document.createElement('div');
+    card.className = 'order-guide-card';
+    card.style.opacity = unlocked ? '1' : '0.4';
+
+    const reqTags = order.required.map(r => {
+      const ing = INGREDIENTS.find(i => i.id === r);
+      return ing ? `<div class="order-guide-tag">${ing.emoji} ${ing.name}</div>` : '';
+    }).join('');
+
+    card.innerHTML = `
+      <div class="order-guide-name">${unlocked ? '' : '🔒 '}${order.name} - ${order.price}₺ ${!unlocked ? `(Lv.${order.unlockLv})` : ''}</div>
+      <div class="order-guide-ingredients">${reqTags}</div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ===== INIT =====
+updateTopBar();
+updateClock();
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && G.selectedTable !== null) serveDoner();
+  if (e.key === 'Escape') {
+    G.selectedTable = null;
+    G.selectedIngredients = [];
+    renderIngredients();
+    updateDonerPreview();
+    checkServeButton();
+    renderTables();
+  }
+});
+
+// Prevent modal close when clicking inside
+document.getElementById('modal').addEventListener('click', e => e.stopPropagation());
+
+</script>
+</body>
+</html>
